@@ -5,7 +5,7 @@ import {
   Heading2Element,
   Heading3Element,
 } from "plugins/heading/types";
-import {ElementProps} from "plugins/types";
+import { ElementProps } from "plugins/types";
 
 export const Heading1 = (
   props: ElementProps & { element: Heading1Element }

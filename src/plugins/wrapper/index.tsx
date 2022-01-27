@@ -1,5 +1,10 @@
 import React from "react";
-import { ReactEditor, RenderElementProps, useSlateStatic } from "slate-react";
+import {
+  ReactEditor,
+  RenderElementProps, useFocused,
+  useSelected,
+  useSlateStatic,
+} from "slate-react";
 import { useSortable } from "@dnd-kit/sortable";
 import cn from "classnames";
 
@@ -12,6 +17,8 @@ const Wrapper = (
   const path = ReactEditor.findPath(editor, element);
   const index = path[0];
   const id = String(index);
+  const isSelected = useSelected();
+  const isFocused = useFocused();
 
   const {
     attributes: sortableAttributes,
@@ -34,6 +41,7 @@ const Wrapper = (
       }}
       className={cn("wrapper", {
         dragging: isDragging,
+        selected: isSelected && isFocused,
       })}
       style={
         {

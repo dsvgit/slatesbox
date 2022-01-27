@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { createEditor, Descendant } from "slate";
+import React, { useCallback, useRef, useState } from "react";
+import {createEditor, Descendant, Editor, Transforms} from "slate";
 import {
   Slate,
   Editable,
@@ -8,6 +8,7 @@ import {
   ReactEditor,
   useSlate,
 } from "slate-react";
+import { withHistory } from "slate-history";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import {
   verticalListSortingStrategy,
@@ -28,7 +29,6 @@ import {
 } from "plugins/heading/components/Heading";
 import Wrapper from "plugins/wrapper";
 import { ElementProps } from "plugins/types";
-import { arrayMove } from "utils";
 
 const renderElementContent = (props: ElementProps) => {
   if (isHeading1Element(props.element)) {
@@ -83,31 +83,25 @@ const App = () => {
     },
   ];
 
-  const editor = useMemo(() => withReact(createEditor()), []);
-  const [value, setValue] = useState<Descendant[]>(initialValue);
+  // const editor = useMemo(() => withReact(createEditor()), []);
+  const editorRef = useRef<Editor>();
+  if (!editorRef.current) {
+    editorRef.current = withHistory(withReact(createEditor()));
+  }
+  const editor = editorRef.current;
 
-  const reorderChildren = useCallback(
-    (from: number, to: number) => {
-      editor.children = arrayMove(editor.children, from, to);
-      setValue(editor.children);
-    },
-    [editor]
-  );
+  const [value, setValue] = useState<Descendant[]>(initialValue);
 
   return (
     <main className="app">
       <Slate editor={editor} value={value} onChange={setValue}>
-        <SlateContent reorderChildren={reorderChildren} />
+        <SlateContent />
       </Slate>
     </main>
   );
 };
 
-type SlateContentProps = {
-  reorderChildren: (from: number, to: number) => void;
-};
-
-const SlateContent = ({ reorderChildren }: SlateContentProps) => {
+const SlateContent = () => {
   const editor = useSlate();
 
   const renderElement = useCallback(
@@ -146,7 +140,10 @@ const SlateContent = ({ reorderChildren }: SlateContentProps) => {
           const activeIndex = Number(active.id);
           const overIndex = Number(over.id);
           if (activeIndex !== overIndex) {
-            reorderChildren(activeIndex, overIndex);
+            Transforms.moveNodes(editor, {
+              at: [activeIndex],
+              to: [overIndex],
+            });
           }
         }
       }}

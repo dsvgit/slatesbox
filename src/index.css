@@ -52,17 +52,17 @@ code {
 
 .handle {
   position: absolute;
-  top: calc(50% - 10px);
+  top: calc(50% - 12px);
   left: -26px;
   user-select: none;
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 23px;
   cursor: grab;
   opacity: 0;
 }
 
-.wrapper:hover .handle {
-  color: lightsteelblue;
+.wrapper:hover .handle, .wrapper.selected .handle {
+  color: lightslategray;
   opacity: 1;
 }
