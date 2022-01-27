@@ -1,26 +1,59 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useCallback, useMemo, useState } from "react";
+import { createEditor, Descendant } from "slate";
+import { Slate, Editable, withReact, RenderElementProps } from "slate-react";
 
-function App() {
+import Paragraph from "plugins/paragraph/components/Paragraph";
+import { ParagraphElement } from "plugins/paragraph/types";
+import {
+  isHeading1Element,
+  isHeading2Element,
+  isHeading3Element,
+} from "plugins/heading/utils";
+import {
+  Heading1,
+  Heading2,
+  Heading3,
+} from "plugins/heading/components/Heading";
+
+const App = () => {
+  const initialValue: Descendant[] = [
+    {
+      type: "h3",
+      children: [{ text: "A line of text in a paragraph." }],
+    },
+    {
+      type: "p",
+      children: [{ text: "A line of text in a paragraph." }],
+    },
+  ];
+
+  const editor = useMemo(() => withReact(createEditor()), []);
+  const [value, setValue] = useState<Descendant[]>(initialValue);
+
+  const renderElement = useCallback((props: RenderElementProps) => {
+    if (isHeading1Element(props.element)) {
+      return <Heading1 {...props} element={props.element} />;
+    }
+
+    if (isHeading2Element(props.element)) {
+      return <Heading2 {...props} element={props.element} />;
+    }
+
+    if (isHeading3Element(props.element)) {
+      return <Heading3 {...props} element={props.element} />;
+    }
+
+    const element = props.element as ParagraphElement;
+    return <Paragraph {...props} element={element} />;
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main className="app">
+      <Slate editor={editor} value={value} onChange={setValue}>
+        <Editable className="editable" renderElement={renderElement} />
+      </Slate>
+    </main>
   );
-}
+};
 
 export default App;
