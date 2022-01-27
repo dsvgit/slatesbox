@@ -28,3 +28,29 @@ code {
 .editable {
   flex: 1;
 }
+
+.editable p {
+  margin: 0;
+  line-height: 25px;
+}
+
+.wrapper {
+  position: relative;
+}
+
+.handle {
+  position: absolute;
+  top: calc(25% - 3px);
+  left: -26px;
+  user-select: none;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor:grab;
+  opacity: 0;
+}
+
+.wrapper:hover .handle {
+  color: lightsteelblue;
+  opacity: 1;
+}

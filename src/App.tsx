@@ -1,6 +1,12 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { createEditor, Descendant } from "slate";
-import { Slate, Editable, withReact, RenderElementProps } from "slate-react";
+import {
+  Slate,
+  Editable,
+  withReact,
+  RenderElementProps,
+  ReactEditor,
+} from "slate-react";
 
 import Paragraph from "plugins/paragraph/components/Paragraph";
 import { ParagraphElement } from "plugins/paragraph/types";
@@ -14,6 +20,25 @@ import {
   Heading2,
   Heading3,
 } from "plugins/heading/components/Heading";
+import Wrapper from "plugins/wrapper";
+import { ElementProps } from "plugins/types";
+
+const renderElementContent = (props: ElementProps) => {
+  if (isHeading1Element(props.element)) {
+    return <Heading1 {...props} element={props.element} />;
+  }
+
+  if (isHeading2Element(props.element)) {
+    return <Heading2 {...props} element={props.element} />;
+  }
+
+  if (isHeading3Element(props.element)) {
+    return <Heading3 {...props} element={props.element} />;
+  }
+
+  const element = props.element as ParagraphElement;
+  return <Paragraph {...props} element={element} />;
+};
 
 const App = () => {
   const initialValue: Descendant[] = [
@@ -30,22 +55,31 @@ const App = () => {
   const editor = useMemo(() => withReact(createEditor()), []);
   const [value, setValue] = useState<Descendant[]>(initialValue);
 
-  const renderElement = useCallback((props: RenderElementProps) => {
-    if (isHeading1Element(props.element)) {
-      return <Heading1 {...props} element={props.element} />;
-    }
+  const renderElement = useCallback(
+    (props: RenderElementProps) => {
+      const { attributes, children, element } = props;
 
-    if (isHeading2Element(props.element)) {
-      return <Heading2 {...props} element={props.element} />;
-    }
+      const path = ReactEditor.findPath(editor, element);
 
-    if (isHeading3Element(props.element)) {
-      return <Heading3 {...props} element={props.element} />;
-    }
+      if (path.length === 1) {
+        return (
+          <Wrapper attributes={attributes} element={element}>
+            {renderElementContent({
+              element,
+              children,
+            })}
+          </Wrapper>
+        );
+      }
 
-    const element = props.element as ParagraphElement;
-    return <Paragraph {...props} element={element} />;
-  }, []);
+      return renderElementContent({
+        attributes,
+        element,
+        children,
+      });
+    },
+    [editor]
+  );
 
   return (
     <main className="app">
