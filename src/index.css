@@ -36,17 +36,29 @@ code {
 
 .wrapper {
   position: relative;
+  transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)
+    scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));
+  padding: 10px;
+  margin: 5px;
+  /*border: 1px solid lightslategrey;*/
+  background-color: white;
+  z-index: 0;
+}
+
+.wrapper.dragging {
+  z-index: 1;
+  background-color: rgba(255,255,255,0.3);
 }
 
 .handle {
   position: absolute;
-  top: calc(25% - 3px);
+  top: calc(50% - 10px);
   left: -26px;
   user-select: none;
   background: none;
   border: none;
   font-size: 18px;
-  cursor:grab;
+  cursor: grab;
   opacity: 0;
 }
 

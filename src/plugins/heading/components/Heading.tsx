@@ -20,7 +20,7 @@ export const Heading2 = (
 ) => {
   const { children, attributes } = props;
 
-  return <h1 {...attributes}>{children}</h1>;
+  return <h2 {...attributes}>{children}</h2>;
 };
 
 export const Heading3 = (
@@ -28,5 +28,5 @@ export const Heading3 = (
 ) => {
   const { children, attributes } = props;
 
-  return <h1 {...attributes}>{children}</h1>;
+  return <h3 {...attributes}>{children}</h3>;
 };

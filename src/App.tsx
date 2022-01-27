@@ -6,7 +6,13 @@ import {
   withReact,
   RenderElementProps,
   ReactEditor,
+  useSlate,
 } from "slate-react";
+import { closestCenter, DndContext } from "@dnd-kit/core";
+import {
+  verticalListSortingStrategy,
+  SortableContext,
+} from "@dnd-kit/sortable";
 
 import Paragraph from "plugins/paragraph/components/Paragraph";
 import { ParagraphElement } from "plugins/paragraph/types";
@@ -22,6 +28,7 @@ import {
 } from "plugins/heading/components/Heading";
 import Wrapper from "plugins/wrapper";
 import { ElementProps } from "plugins/types";
+import { arrayMove } from "utils";
 
 const renderElementContent = (props: ElementProps) => {
   if (isHeading1Element(props.element)) {
@@ -43,7 +50,31 @@ const renderElementContent = (props: ElementProps) => {
 const App = () => {
   const initialValue: Descendant[] = [
     {
-      type: "h3",
+      type: "h1",
+      children: [{ text: "A line of text in a paragraph." }],
+    },
+    {
+      type: "p",
+      children: [{ text: "A line of text in a paragraph." }],
+    },
+    {
+      type: "p",
+      children: [
+        {
+          text: "A line of text in a paragraph. A line of text in a paragraph. A line of text in a paragraph. A line of text in a paragraph.",
+        },
+      ],
+    },
+    {
+      type: "p",
+      children: [{ text: "A line of text in a paragraph." }],
+    },
+    {
+      type: "h2",
+      children: [{ text: "A line of text in a paragraph." }],
+    },
+    {
+      type: "p",
       children: [{ text: "A line of text in a paragraph." }],
     },
     {
@@ -54,6 +85,30 @@ const App = () => {
 
   const editor = useMemo(() => withReact(createEditor()), []);
   const [value, setValue] = useState<Descendant[]>(initialValue);
+
+  const reorderChildren = useCallback(
+    (from: number, to: number) => {
+      editor.children = arrayMove(editor.children, from, to);
+      setValue(editor.children);
+    },
+    [editor]
+  );
+
+  return (
+    <main className="app">
+      <Slate editor={editor} value={value} onChange={setValue}>
+        <SlateContent reorderChildren={reorderChildren} />
+      </Slate>
+    </main>
+  );
+};
+
+type SlateContentProps = {
+  reorderChildren: (from: number, to: number) => void;
+};
+
+const SlateContent = ({ reorderChildren }: SlateContentProps) => {
+  const editor = useSlate();
 
   const renderElement = useCallback(
     (props: RenderElementProps) => {
@@ -82,11 +137,27 @@ const App = () => {
   );
 
   return (
-    <main className="app">
-      <Slate editor={editor} value={value} onChange={setValue}>
+    <DndContext
+      collisionDetection={closestCenter}
+      onDragEnd={(result) => {
+        const { active, over } = result;
+
+        if (over) {
+          const activeIndex = Number(active.id);
+          const overIndex = Number(over.id);
+          if (activeIndex !== overIndex) {
+            reorderChildren(activeIndex, overIndex);
+          }
+        }
+      }}
+    >
+      <SortableContext
+        strategy={verticalListSortingStrategy}
+        items={editor.children.map((item, index) => index.toString())}
+      >
         <Editable className="editable" renderElement={renderElement} />
-      </Slate>
-    </main>
+      </SortableContext>
+    </DndContext>
   );
 };
 
