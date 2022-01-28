@@ -1,4 +1,5 @@
 import { Descendant } from "slate";
+import { FoldingElement } from "plugins/folding/types";
 
 export type Heading1Type = "h1";
 export const Heading1Type: Heading1Type = "h1";
@@ -13,16 +14,16 @@ export type Heading1Element = {
   // id: string;
   type: Heading1Type;
   children: Descendant[];
-};
+} & FoldingElement;
 
 export type Heading2Element = {
   // id: string;
   type: Heading2Type;
   children: Descendant[];
-};
+} & FoldingElement;
 
 export type Heading3Element = {
   // id: string;
   type: Heading3Type;
   children: Descendant[];
-};
+} & FoldingElement;

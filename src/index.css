@@ -17,7 +17,7 @@ code {
 }
 
 .app {
-  max-width: 600px;
+  max-width: 800px;
   padding: 40px;
   margin: 0 auto;
   min-height: 100vh;
@@ -43,14 +43,35 @@ code {
   /*border: 1px solid lightslategrey;*/
   background-color: white;
   z-index: 0;
+  outline: none;
 }
 
 .wrapper.dragging {
   z-index: 1;
-  background-color: rgba(255,255,255,0.3);
+  background-color: rgba(255, 255, 255, 0.3);
+  --scale-x: 1.04;
+  --scale-y: 1.04;
 }
 
 .handle {
+  position: absolute;
+  top: calc(50% - 12px);
+  left: -48px;
+  user-select: none;
+  background: none;
+  border: none;
+  font-size: 23px;
+  cursor: grab;
+  opacity: 0;
+  color: lightslategray;
+}
+
+.wrapper:hover .handle,
+.wrapper.selected .handle {
+  opacity: 1;
+}
+
+.folding {
   position: absolute;
   top: calc(50% - 12px);
   left: -26px;
@@ -58,11 +79,13 @@ code {
   background: none;
   border: none;
   font-size: 23px;
-  cursor: grab;
-  opacity: 0;
+  color: lightslategray;
+  transition: 200ms transform;
+  transform: rotate(var(--rotate, 90deg));
 }
 
-.wrapper:hover .handle, .wrapper.selected .handle {
-  color: lightslategray;
-  opacity: 1;
+.hidden {
+  display: none;
+  height: 0;
 }
+
