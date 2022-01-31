@@ -117,11 +117,12 @@ const DndPluginContext = ({
       measuring={measuring}
       autoScroll={{
         threshold: {
-          x: 0.14,
-          y: 0.14,
+          x: 0.25,
+          y: 0.25,
         },
-        acceleration: 10,
-        activator: AutoScrollActivator.DraggableRect,
+        acceleration: 18,
+        // activator: AutoScrollActivator.DraggableRect,
+        activator: AutoScrollActivator.Pointer,
       }}
     >
       <SortableContext strategy={verticalListSortingStrategy} items={items}>
