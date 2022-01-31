@@ -5,13 +5,17 @@ body {
     "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 20px;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
 }
 
 * {
@@ -24,11 +28,18 @@ body.grabbing {
 
 .app {
   max-width: 800px;
+  /*width: 300px;*/
   padding: 40px;
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+@media only screen and (max-width: 768px) {
+  .app {
+    padding: 18px;
+  }
 }
 
 .editable {
@@ -52,7 +63,7 @@ body.grabbing {
   background-color: white;
   z-index: 0;
   outline: none;
-  will-change: transform;
+  /*will-change: transform;*/
 }
 
 .wrapper.dragging {
@@ -68,16 +79,36 @@ body.grabbing {
 
 .wrapper.dragOverlay {
   cursor: inherit;
-  opacity: 1;
+  opacity: 0.9;
   background-color: white;
-  box-shadow: 0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05),
-    -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25);
+  /*box-shadow: 0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05),*/
+  /*  -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25);*/
+
+  -webkit-box-shadow: 0px 0px 13px 2px rgba(34, 60, 80, 0.2);
+  -moz-box-shadow: 0px 0px 13px 2px rgba(34, 60, 80, 0.2);
+  box-shadow: 0px 0px 13px 2px rgba(34, 60, 80, 0.2);
+}
+
+.actions {
+  position: absolute;
+  top: 0;
+  left: -47px;
+  width: 47px;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+
+  /*background-color: red;*/
+}
+
+@media only screen and (max-width: 768px) {
+  .actions {
+    left: -20px;
+    width: 20px;
+  }
 }
 
 .handle {
-  position: absolute;
-  top: calc(50% - 12px);
-  left: -48px;
   user-select: none;
   background: none;
   border: none;
@@ -85,6 +116,17 @@ body.grabbing {
   cursor: grab;
   opacity: 0;
   color: lightslategray;
+  height: 100%;
+  padding: 0;
+  flex: 1;
+
+  /*background-color: blue;*/
+}
+
+@media only screen and (max-width: 768px) {
+  .handle {
+    opacity: 1;
+  }
 }
 
 .wrapper.dragging .handle,
@@ -99,14 +141,18 @@ body.grabbing {
 
 .folding {
   cursor: inherit;
-  position: absolute;
-  top: calc(50% - 12px);
-  left: -26px;
   user-select: none;
   background: none;
   border: none;
-  font-size: 23px;
+  font-size: 18px;
   color: lightslategray;
+  padding: 0;
+  flex: 1;
+
+  /*background-color: green;*/
+}
+
+.folding div {
   transition: 200ms transform;
   transform: rotate(var(--rotate, 90deg));
 }
@@ -114,4 +160,44 @@ body.grabbing {
 .hidden {
   display: none;
   height: 0;
+}
+
+.disableSelection * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.disableInteraction {
+  pointer-events: none;
+}
+
+.wrapper.dragging.indicator {
+  opacity: 1;
+  position: relative;
+  z-index: 1;
+  /*margin-bottom: -1px;*/
+
+  padding: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #0073f8;
+}
+
+.indicator > * {
+  /* Items are hidden using height and opacity to retain focus */
+  opacity: 0;
+  height: 0;
+}
+
+.image-wrapper {
+  position: relative;
+}
+
+.image::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  content: " ";
 }

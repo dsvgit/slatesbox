@@ -5,17 +5,16 @@ const renderFoldingArrow = (
   onFold?: React.MouseEventHandler
 ) => {
   return (
-    <button
-      contentEditable={false}
-      className="folding"
-      style={
-        {
-          "--rotate": folded ? "0deg" : "90deg",
-        } as React.CSSProperties
-      }
-      onClick={onFold}
-    >
-      &gt;
+    <button contentEditable={false} className="folding" onClick={onFold}>
+      <div
+        style={
+          {
+            "--rotate": folded ? "0deg" : "90deg",
+          } as React.CSSProperties
+        }
+      >
+        &gt;
+      </div>
     </button>
   );
 };

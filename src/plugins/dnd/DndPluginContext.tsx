@@ -1,10 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { createEditor, Editor, Transforms, Descendant, Element } from "slate";
 import {
+  AutoScrollActivator,
   closestCenter,
   DndContext,
   DragEndEvent,
   DragOverlay,
+  MeasuringStrategy,
+  Modifier,
   MouseSensor,
   TouchSensor,
   useSensor,
@@ -28,8 +31,22 @@ import { getSemanticChildren, isFoldingElement } from "plugins/folding/utils";
 
 const clone = (x: object) => JSON.parse(JSON.stringify(x));
 
+const measuring = {
+  droppable: {
+    strategy: MeasuringStrategy.Always,
+  },
+};
+
 type DndPluginContextProps = {
   editor: Editor;
+};
+
+// indicator support
+const adjustTranslate: Modifier = ({ transform }) => {
+  return {
+    ...transform,
+    y: transform.y - 25,
+  };
 };
 
 const DndPluginContext = ({
@@ -41,7 +58,15 @@ const DndPluginContext = ({
 
   const items = editor.children.map((item, index) => index.toString());
 
-  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 230,
+        tolerance: 10,
+      },
+    })
+  );
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
@@ -87,8 +112,17 @@ const DndPluginContext = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
-      modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+      // modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
       sensors={sensors}
+      measuring={measuring}
+      autoScroll={{
+        threshold: {
+          x: 0.14,
+          y: 0.14,
+        },
+        acceleration: 10,
+        activator: AutoScrollActivator.DraggableRect,
+      }}
     >
       <SortableContext strategy={verticalListSortingStrategy} items={items}>
         {children}
@@ -101,6 +135,7 @@ const DndPluginContext = ({
             easing: "none",
             dragSourceOpacity: 0,
           }}
+          // modifiers={[adjustTranslate]}
         >
           {activeElement && Element.isElement(activeElement)
             ? renderWrapperContent({

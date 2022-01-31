@@ -10,16 +10,12 @@ import type { Transform } from "@dnd-kit/utilities";
 import cn from "classnames";
 import { Editor, Path, Transforms, Element } from "slate";
 import type { DraggableSyntheticListeners } from "@dnd-kit/core";
+import { isMobile, isIOS } from "react-device-detect";
 
-import {
-  getFoldedIndexes,
-  getSemanticChildren,
-  isFoldingElement,
-} from "plugins/folding/utils";
+import { getFoldedIndexes, isFoldingElement } from "plugins/folding/utils";
 import { isImageElement } from "plugins/image/utils";
 import renderFoldingArrow from "plugins/folding/renderFoldingArrow";
 import renderDndHandle from "plugins/dnd/renderDndHandle";
-import { useDndContext } from "@dnd-kit/core";
 
 const Wrapper = (
   props: Omit<RenderElementProps, "children"> & { children: React.ReactNode }
@@ -42,12 +38,17 @@ const Wrapper = (
   const {
     attributes: sortableAttributes,
     isDragging,
+    isSorting,
     listeners,
     setNodeRef,
     transform,
     transition,
   } = useSortable({
     id,
+    transition: {
+      duration: 350,
+      easing: "ease",
+    },
   });
 
   // const context = useDndContext();
@@ -76,6 +77,30 @@ const Wrapper = (
 
   if (folded) {
     return null;
+    // return (
+    //   <div
+    //     {...slateAttributes}
+    //     {...sortableAttributes}
+    //     ref={(ref) => {
+    //       slateAttributes.ref.current = ref;
+    //       setNodeRef(ref);
+    //     }}
+    //     style={
+    //       {
+    //         transition,
+    //         "--translate-x": transform
+    //           ? `${Math.round(transform.x)}px`
+    //           : undefined,
+    //         "--translate-y": transform
+    //           ? `${Math.round(transform.y)}px`
+    //           : undefined,
+    //       } as React.CSSProperties
+    //     }
+    //     contentEditable={false}
+    //   >
+    //     green
+    //   </div>
+    // );
   }
 
   return renderWrapperContent({
@@ -88,6 +113,7 @@ const Wrapper = (
     transform,
     listeners,
     isDragging,
+    isSorting,
     handle: isFirstInSelection && isFocused,
     attributes: {
       ...slateAttributes,
@@ -105,6 +131,7 @@ type RenderContentProps = {
   transform?: Transform | null;
   listeners?: DraggableSyntheticListeners;
   isDragging?: boolean;
+  isSorting?: boolean;
   handle?: boolean;
   attributes?: ReturnType<typeof useSortable>["attributes"] &
     RenderElementProps["attributes"];
@@ -120,6 +147,7 @@ export const renderWrapperContent = ({
   transform,
   listeners,
   isDragging = false,
+  isSorting = false,
   handle = false,
   attributes,
   onFold,
@@ -133,10 +161,13 @@ export const renderWrapperContent = ({
         dragging: isDragging,
         selected: handle,
         dragOverlay: isDragOverlay,
+        disableSelection: isIOS && isSorting,
+        disableInteraction: isSorting,
+        // indicator: isDragging,
       })}
       style={
         {
-          // transition,
+          transition,
           "--translate-x": transform
             ? `${Math.round(transform.x)}px`
             : undefined,
@@ -145,11 +176,15 @@ export const renderWrapperContent = ({
             : undefined,
         } as React.CSSProperties
       }
-      {...(isImageElement(element) && listeners)}
     >
-      {renderDndHandle(listeners)}
-      {isFoldingElement(element) && renderFoldingArrow(element.folded, onFold)}
-      {children}
+      <div className="actions">
+        {!isMobile && renderDndHandle(listeners)}
+        {isFoldingElement(element) &&
+          renderFoldingArrow(element.folded, onFold)}
+      </div>
+      <div {...((isImageElement(element) || isMobile) && listeners)}>
+        {children}
+      </div>
     </div>
   );
 };

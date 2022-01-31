@@ -41,7 +41,7 @@ const initialValue: Descendant[] = [
   },
   {
     type: "h2",
-    folded: true,
+    folded: false,
     children: [{ text: "Myth origins" }],
   },
   {
