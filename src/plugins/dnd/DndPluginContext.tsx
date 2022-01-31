@@ -13,6 +13,10 @@ import {
   SortableContext,
 } from "@dnd-kit/sortable";
 import { DragStartEvent } from "@dnd-kit/core/dist/types";
+import {
+  restrictToVerticalAxis,
+  restrictToWindowEdges,
+} from "@dnd-kit/modifiers";
 import { Slate, Editable, withReact } from "slate-react";
 import { createPortal } from "react-dom";
 
@@ -73,6 +77,7 @@ const DndPluginContext = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
+      modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
     >
       <SortableContext strategy={verticalListSortingStrategy} items={items}>
         {children}
