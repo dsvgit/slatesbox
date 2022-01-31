@@ -136,7 +136,7 @@ export const renderWrapperContent = ({
       })}
       style={
         {
-          transition,
+          // transition,
           "--translate-x": transform
             ? `${Math.round(transform.x)}px`
             : undefined,
