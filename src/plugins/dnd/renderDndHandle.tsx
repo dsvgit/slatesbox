@@ -1,8 +1,10 @@
 import React from "react";
 
-import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 
-const renderDndHandle = (listeners: SyntheticListenerMap | undefined) => {
+const renderDndHandle = (
+  listeners: DraggableSyntheticListeners | undefined
+) => {
   return (
     <button contentEditable={false} className="handle" {...listeners}>
       ⠿

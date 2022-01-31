@@ -1,34 +1,19 @@
 import React from "react";
-import { Editor, Transforms, Element, Path } from "slate";
 
-import { isFoldingElement } from "plugins/folding/utils";
-
-const renderFoldingArrow = (editor: Editor, element: Element, path: Path) => {
-  if (!isFoldingElement(element)) {
-    return null;
-  }
-
-  const handleFold = () => {
-    Transforms.setNodes(
-      editor,
-      { folded: !element.folded },
-      {
-        at: path,
-        match: (node) => node === element,
-      }
-    );
-  };
-
+const renderFoldingArrow = (
+  folded: boolean | undefined = false,
+  onFold?: React.MouseEventHandler
+) => {
   return (
     <button
       contentEditable={false}
       className="folding"
       style={
         {
-          "--rotate": element.folded ? "0deg" : "90deg",
+          "--rotate": folded ? "0deg" : "90deg",
         } as React.CSSProperties
       }
-      onClick={handleFold}
+      onClick={onFold}
     >
       &gt;
     </button>

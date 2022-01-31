@@ -38,6 +38,9 @@ code {
   position: relative;
   transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)
     scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));
+  transform-origin: 0 0;
+  touch-action: manipulation;
+
   padding: 10px;
   margin: 5px;
   /*border: 1px solid lightslategrey;*/
@@ -52,6 +55,18 @@ code {
   background-color: rgba(255, 255, 255, 0.3);
   --scale-x: 1.04;
   --scale-y: 1.04;
+}
+
+.wrapper.dragging:not(.dragOverlay) {
+  opacity: 0.3;
+}
+
+.wrapper.dragOverlay {
+  cursor: inherit;
+  opacity: 1;
+  background-color: white;
+  box-shadow: 0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05),
+    -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25);
 }
 
 .handle {
@@ -89,4 +104,3 @@ code {
   display: none;
   height: 0;
 }
-

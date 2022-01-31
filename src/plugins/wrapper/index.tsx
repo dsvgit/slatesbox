@@ -6,10 +6,12 @@ import {
   useSlate,
 } from "slate-react";
 import { useSortable } from "@dnd-kit/sortable";
+import type { Transform } from "@dnd-kit/utilities";
 import cn from "classnames";
-import { Editor, Path } from "slate";
+import { Editor, Path, Transforms, Element } from "slate";
+import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 
-import { foldedIndexes } from "plugins/folding/utils";
+import { foldedIndexes, isFoldingElement } from "plugins/folding/utils";
 import { isImageElement } from "plugins/image/utils";
 import renderFoldingArrow from "plugins/folding/renderFoldingArrow";
 import renderDndHandle from "plugins/dnd/renderDndHandle";
@@ -17,7 +19,7 @@ import renderDndHandle from "plugins/dnd/renderDndHandle";
 const Wrapper = (
   props: Omit<RenderElementProps, "children"> & { children: React.ReactNode }
 ) => {
-  const { attributes, children, element } = props;
+  const { attributes: slateAttributes, children, element } = props;
 
   const editor = useSlate();
   const path = ReactEditor.findPath(editor, element);
@@ -25,12 +27,12 @@ const Wrapper = (
   const id = String(index);
   const isFocused = useFocused();
 
-  const isFirstInSelection =
-    editor.selection &&
-    Path.equals(
-      Editor.edges(editor, editor.selection)[0].path.slice(0, 1),
-      path
-    );
+  const isFirstInSelection = editor.selection
+    ? Path.equals(
+        Editor.edges(editor, editor.selection)[0].path.slice(0, 1),
+        path
+      )
+    : false;
 
   const {
     attributes: sortableAttributes,
@@ -43,6 +45,17 @@ const Wrapper = (
     id,
   });
 
+  const handleFold = () => {
+    Transforms.setNodes(
+      editor,
+      { folded: isFoldingElement(element) && !element.folded },
+      {
+        at: path,
+        match: (node) => node === element,
+      }
+    );
+  };
+
   const indexes = foldedIndexes(editor.children);
   const folded = indexes.has(path[0]);
 
@@ -50,17 +63,61 @@ const Wrapper = (
     return null;
   }
 
+  return renderWrapperContent({
+    ref: (ref) => {
+      slateAttributes.ref.current = ref;
+      setNodeRef(ref);
+    },
+    element,
+    transition,
+    transform,
+    listeners,
+    isDragging,
+    handle: isFirstInSelection && isFocused,
+    attributes: {
+      ...slateAttributes,
+      ...sortableAttributes,
+    },
+    onFold: handleFold,
+    children,
+  });
+};
+
+type RenderContentProps = {
+  ref?: React.Ref<HTMLDivElement>;
+  element: Element;
+  transition?: string | null;
+  transform?: Transform | null;
+  listeners?: DraggableSyntheticListeners;
+  isDragging?: boolean;
+  handle?: boolean;
+  attributes?: ReturnType<typeof useSortable>["attributes"] &
+    RenderElementProps["attributes"];
+  onFold?: React.MouseEventHandler;
+  isDragOverlay?: boolean;
+};
+
+export const renderWrapperContent = ({
+  ref,
+  element,
+  children,
+  transition,
+  transform,
+  listeners,
+  isDragging = false,
+  handle = false,
+  attributes,
+  onFold,
+  isDragOverlay = false,
+}: React.PropsWithChildren<RenderContentProps>) => {
   return (
     <div
       {...attributes}
-      {...sortableAttributes}
-      ref={(ref) => {
-        attributes.ref.current = ref;
-        setNodeRef(ref);
-      }}
+      ref={ref}
       className={cn("wrapper", {
         dragging: isDragging,
-        selected: isFirstInSelection && isFocused,
+        selected: handle,
+        dragOverlay: isDragOverlay
       })}
       style={
         {
@@ -71,13 +128,12 @@ const Wrapper = (
           "--translate-y": transform
             ? `${Math.round(transform.y)}px`
             : undefined,
-          "--index": index,
         } as React.CSSProperties
       }
       {...(isImageElement(element) && listeners)}
     >
       {renderDndHandle(listeners)}
-      {renderFoldingArrow(editor, element, path)}
+      {isFoldingElement(element) && renderFoldingArrow(element.folded, onFold)}
       {children}
     </div>
   );

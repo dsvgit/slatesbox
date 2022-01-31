@@ -101,15 +101,154 @@ const initialValue: Descendant[] = [
 
 const clone = (x: object) => JSON.parse(JSON.stringify(x));
 
-console.log(clone(initialValue));
+const simpleValue: Descendant[] = [
+  {
+    type: "h1",
+    children: [{ text: "First item" }],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 1",
+      },
+    ],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 2",
+      },
+    ],
+  },
+  {
+    type: "h1",
+    children: [{ text: "Second item" }],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 1",
+      },
+    ],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 2",
+      },
+    ],
+  },
+  {
+    type: "h1",
+    children: [{ text: "Second item" }],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 1",
+      },
+    ],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 2",
+      },
+    ],
+  },
+  {
+    type: "h1",
+    children: [{ text: "Second item" }],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 1",
+      },
+    ],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 2",
+      },
+    ],
+  },
+  {
+    type: "h1",
+    children: [{ text: "Second item" }],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 1",
+      },
+    ],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 2",
+      },
+    ],
+  },
+  {
+    type: "h1",
+    children: [{ text: "Second item" }],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 1",
+      },
+    ],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 2",
+      },
+    ],
+  },
+  {
+    type: "h1",
+    children: [{ text: "Second item" }],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 1",
+      },
+    ],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 2",
+      },
+    ],
+  },
+];
 
 const data = [
-  ...initialValue,
   ...clone(initialValue),
   ...clone(initialValue),
   ...clone(initialValue),
   ...clone(initialValue),
-
 ];
 
 console.log(data.length);

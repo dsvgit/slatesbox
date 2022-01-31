@@ -51,7 +51,7 @@ const useRenderElement = (editor: Editor) => {
 
 export default useRenderElement;
 
-const renderElementContent = (props: ElementProps) => {
+export const renderElementContent = (props: ElementProps) => {
   if (isHeading1Element(props.element)) {
     return <Heading1 {...props} element={props.element} />;
   }
