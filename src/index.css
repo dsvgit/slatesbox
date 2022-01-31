@@ -44,6 +44,7 @@ code {
   background-color: white;
   z-index: 0;
   outline: none;
+  will-change: transform;
 }
 
 .wrapper.dragging {

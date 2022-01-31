@@ -12,7 +12,7 @@ export const isFoldingElement = (element: any): element is FoldingElement => {
   return isHeadingElement(element);
 };
 
-const getLevel = (element: FoldingElement) => {
+const getLevel = (element: Element) => {
   if (isHeading1Element(element)) {
     return 1;
   }
@@ -25,30 +25,67 @@ const getLevel = (element: FoldingElement) => {
     return 3;
   }
 
-  return null;
+  return 999;
+};
+
+export type SemanticNode = {
+  element: Element;
+  children: SemanticNode[];
+};
+
+const ELEMENT_TO_SEMANTIC_PATH: WeakMap<Element, SemanticNode[]> =
+  new WeakMap();
+
+export const buildSemanticTree = (content: Descendant[]) => {
+  const tree: SemanticNode[] = [];
+  const path: SemanticNode[] = [];
+
+  for (const element of content) {
+    if (!Element.isElement(element)) {
+      continue;
+    }
+
+    const level = getLevel(element);
+
+    const edgeIndex = path.findIndex((p) => getLevel(p.element) >= level);
+    if (edgeIndex !== -1) {
+      path.splice(edgeIndex);
+    }
+    path.push({ element, children: [] });
+
+    ELEMENT_TO_SEMANTIC_PATH.set(element, [...path]);
+
+    const last = path[path.length - 1];
+    const parent = path[path.length - 2];
+    const children = parent ? parent.children : tree;
+
+    children.push(last);
+  }
+
+  return tree;
 };
 
 export const foldedIndexes = (content: Descendant[]) => {
-  const indexes = new Set();
-
+  const indexes = new Set<number>();
   let index = 0;
-  let path: FoldingElement[] = [];
   for (const element of content) {
-    if (isFoldingElement(element)) {
-      const level = getLevel(element);
-
-      if (level != null) {
-        const edgeIndex = path.findIndex((part) => getLevel(part)! >= level);
-        path = edgeIndex === -1 ? path : path.slice(0, edgeIndex);
-        path.push(element);
-      }
+    if (!Element.isElement(element)) {
+      continue;
     }
 
-    const folded = path.some((part) => element !== part && part.folded);
+    const semanticPath = ELEMENT_TO_SEMANTIC_PATH.get(element)!;
 
-    if (folded) {
+    if (
+      semanticPath.some(
+        (node) =>
+          isFoldingElement(node.element) &&
+          node.element !== element &&
+          node.element.folded
+      )
+    ) {
       indexes.add(index);
     }
+
     index++;
   }
 

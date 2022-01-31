@@ -5,7 +5,7 @@ export const withImage = (editor: Editor) => {
   const { isVoid } = editor;
 
   editor.isVoid = (element: Element) =>
-    isVoid(element) || isImageElement(element);
+    isImageElement(element) ? true : isVoid(element);
 
   return editor;
 };

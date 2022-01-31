@@ -7,10 +7,12 @@ import {
 } from "slate-react";
 import { useSortable } from "@dnd-kit/sortable";
 import cn from "classnames";
-import { Editor, Path, Transforms } from "slate";
+import { Editor, Path } from "slate";
 
-import { foldedIndexes, isFoldingElement } from "plugins/folding/utils";
+import { foldedIndexes } from "plugins/folding/utils";
 import { isImageElement } from "plugins/image/utils";
+import renderFoldingArrow from "plugins/folding/renderFoldingArrow";
+import renderDndHandle from "plugins/dnd/renderDndHandle";
 
 const Wrapper = (
   props: Omit<RenderElementProps, "children"> & { children: React.ReactNode }
@@ -59,7 +61,6 @@ const Wrapper = (
       className={cn("wrapper", {
         dragging: isDragging,
         selected: isFirstInSelection && isFocused,
-        hidden: folded,
       })}
       style={
         {
@@ -75,32 +76,8 @@ const Wrapper = (
       }
       {...(isImageElement(element) && listeners)}
     >
-      <button contentEditable={false} className="handle" {...listeners}>
-        ⠿
-      </button>
-      {isFoldingElement(element) && (
-        <button
-          contentEditable={false}
-          className="folding"
-          style={
-            {
-              "--rotate": element.folded ? "0deg" : "90deg",
-            } as React.CSSProperties
-          }
-          onClick={() => {
-            Transforms.setNodes(
-              editor,
-              { folded: !element.folded },
-              {
-                at: path,
-                match: (node) => node === element,
-              }
-            );
-          }}
-        >
-          &gt;
-        </button>
-      )}
+      {renderDndHandle(listeners)}
+      {renderFoldingArrow(editor, element, path)}
       {children}
     </div>
   );
