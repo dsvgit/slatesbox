@@ -5,6 +5,10 @@ import {
   DndContext,
   DragEndEvent,
   DragOverlay,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 import {
   verticalListSortingStrategy,
@@ -36,6 +40,8 @@ const DndPluginContext = ({
   const activeElement = activeId ? editor.children[Number(activeId)] : null;
 
   const items = editor.children.map((item, index) => index.toString());
+
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
@@ -82,6 +88,7 @@ const DndPluginContext = ({
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
       modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+      sensors={sensors}
     >
       <SortableContext strategy={verticalListSortingStrategy} items={items}>
         {children}
