@@ -16,6 +16,10 @@ code {
   box-sizing: border-box;
 }
 
+body.grabbing {
+  cursor: grabbing;
+}
+
 .app {
   max-width: 800px;
   padding: 40px;
@@ -82,12 +86,18 @@ code {
   color: lightslategray;
 }
 
+.wrapper.dragging .handle,
+.wrapper.dragOverlay .handle {
+  cursor: inherit;
+}
+
 .wrapper:hover .handle,
 .wrapper.selected .handle {
   opacity: 1;
 }
 
 .folding {
+  cursor: inherit;
   position: absolute;
   top: calc(50% - 12px);
   left: -26px;

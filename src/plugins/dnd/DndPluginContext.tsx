@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { createEditor, Editor, Transforms, Node, Descendant } from "slate";
 import {
   closestCenter,
@@ -94,21 +94,7 @@ const DndPluginContext = ({
           {activeElement && Editor.isBlock(editor, activeElement)
             ? renderWrapperContent({
                 element: activeElement,
-                children: (
-                  <div contentEditable={false}>
-                    <Slate
-                      editor={overlayEditor}
-                      value={[JSON.parse(JSON.stringify(activeElement))]}
-                      onChange={() => {}}
-                    >
-                      <Editable
-                        className="editable"
-                        renderElement={renderElementContent}
-                        readOnly={true}
-                      />
-                    </Slate>
-                  </div>
-                ),
+                children: <DragOverlayContent element={activeElement} />,
                 isDragOverlay: true,
               })
             : null}
@@ -120,3 +106,31 @@ const DndPluginContext = ({
 };
 
 export default DndPluginContext;
+
+const DragOverlayContent = ({ element }: { element: Descendant }) => {
+  const overlayEditor = useMemo(() => withReact(createEditor()), []);
+
+  useEffect(() => {
+    document.body.classList.add("grabbing");
+
+    return () => {
+      document.body.classList.remove("grabbing");
+    };
+  }, []);
+
+  return (
+    <div contentEditable={false}>
+      <Slate
+        editor={overlayEditor}
+        value={[JSON.parse(JSON.stringify(element))]}
+        onChange={() => {}}
+      >
+        <Editable
+          className="editable"
+          renderElement={renderElementContent}
+          readOnly={true}
+        />
+      </Slate>
+    </div>
+  );
+};
