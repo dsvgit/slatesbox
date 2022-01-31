@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { createEditor, Editor, Transforms, Node, Descendant } from "slate";
+import { createEditor, Editor, Transforms, Descendant, Element } from "slate";
 import {
   closestCenter,
-  defaultDropAnimation,
   DndContext,
   DragEndEvent,
   DragOverlay,
-  DropAnimation,
 } from "@dnd-kit/core";
 import {
   verticalListSortingStrategy,
@@ -22,22 +20,19 @@ import { createPortal } from "react-dom";
 
 import { renderElementContent } from "hooks/useRenderElement";
 import { renderWrapperContent } from "plugins/wrapper";
+import { getSemanticChildren, isFoldingElement } from "plugins/folding/utils";
+
+const clone = (x: object) => JSON.parse(JSON.stringify(x));
 
 type DndPluginContextProps = {
   editor: Editor;
-};
-
-const defaultDropAnimationConfig: DropAnimation = {
-  ...defaultDropAnimation,
-  dragSourceOpacity: 0.5,
 };
 
 const DndPluginContext = ({
   editor,
   children,
 }: React.PropsWithChildren<DndPluginContextProps>) => {
-  const overlayEditor = useMemo(() => withReact(createEditor()), []);
-  const [activeId, setActiveId] = useState<string | null>("0");
+  const [activeId, setActiveId] = useState<string | null>(null);
   const activeElement = activeId ? editor.children[Number(activeId)] : null;
 
   const items = editor.children.map((item, index) => index.toString());
@@ -60,8 +55,17 @@ const DndPluginContext = ({
         const activeIndex = Number(active.id);
         const overIndex = Number(over.id);
         if (activeIndex !== overIndex) {
+          const activeElement = editor.children[activeIndex];
+          const semanticChildren = getSemanticChildren(activeElement);
+
           Transforms.moveNodes(editor, {
-            at: [activeIndex],
+            at: [],
+            match: (node) =>
+              node === activeElement ||
+              (isFoldingElement(activeElement) &&
+                Boolean(activeElement.folded) &&
+                Element.isElement(node) &&
+                semanticChildren.includes(node)),
             to: [overIndex],
           });
         }
@@ -91,10 +95,12 @@ const DndPluginContext = ({
             dragSourceOpacity: 0,
           }}
         >
-          {activeElement && Editor.isBlock(editor, activeElement)
+          {activeElement && Element.isElement(activeElement)
             ? renderWrapperContent({
                 element: activeElement,
-                children: <DragOverlayContent element={activeElement} />,
+                children: (
+                  <DragOverlayContent editor={editor} element={activeElement} />
+                ),
                 isDragOverlay: true,
               })
             : null}
@@ -107,8 +113,20 @@ const DndPluginContext = ({
 
 export default DndPluginContext;
 
-const DragOverlayContent = ({ element }: { element: Descendant }) => {
+const DragOverlayContent = ({
+  editor,
+  element,
+}: {
+  editor: Editor;
+  element: Descendant;
+}) => {
   const overlayEditor = useMemo(() => withReact(createEditor()), []);
+  const semanticChildren = getSemanticChildren(element);
+  // const content =
+  //   isFoldingElement(element) && element.folded
+  //     ? clone([element])
+  //     : clone([element, ...semanticChildren]);
+  const content = clone([element]);
 
   useEffect(() => {
     document.body.classList.add("grabbing");
@@ -120,11 +138,7 @@ const DragOverlayContent = ({ element }: { element: Descendant }) => {
 
   return (
     <div contentEditable={false}>
-      <Slate
-        editor={overlayEditor}
-        value={[JSON.parse(JSON.stringify(element))]}
-        onChange={() => {}}
-      >
+      <Slate editor={overlayEditor} value={content} onChange={() => {}}>
         <Editable
           className="editable"
           renderElement={renderElementContent}

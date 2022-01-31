@@ -245,10 +245,10 @@ const simpleValue: Descendant[] = [
 ];
 
 const data = [
+  // ...clone(simpleValue),
   ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
 ];
 
 console.log(data.length);

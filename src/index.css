@@ -5,6 +5,8 @@ body {
     "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 15px;
+  line-height: 20px;
 }
 
 code {
@@ -35,7 +37,6 @@ body.grabbing {
 
 .editable p {
   margin: 0;
-  line-height: 25px;
 }
 
 .wrapper {
@@ -45,7 +46,7 @@ body.grabbing {
   transform-origin: 0 0;
   touch-action: manipulation;
 
-  padding: 10px;
+  padding: 3px;
   margin: 5px;
   /*border: 1px solid lightslategrey;*/
   background-color: white;

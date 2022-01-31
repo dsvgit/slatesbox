@@ -11,10 +11,15 @@ import cn from "classnames";
 import { Editor, Path, Transforms, Element } from "slate";
 import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 
-import { foldedIndexes, isFoldingElement } from "plugins/folding/utils";
+import {
+  getFoldedIndexes,
+  getSemanticChildren,
+  isFoldingElement,
+} from "plugins/folding/utils";
 import { isImageElement } from "plugins/image/utils";
 import renderFoldingArrow from "plugins/folding/renderFoldingArrow";
 import renderDndHandle from "plugins/dnd/renderDndHandle";
+import { useDndContext } from "@dnd-kit/core";
 
 const Wrapper = (
   props: Omit<RenderElementProps, "children"> & { children: React.ReactNode }
@@ -45,6 +50,16 @@ const Wrapper = (
     id,
   });
 
+  // const context = useDndContext();
+  // if (context.active) {
+  //   const draggingElement = editor.children[Number(context.active.id)];
+  //   const semanticChildren = getSemanticChildren(editor, draggingElement);
+  //
+  //   if (semanticChildren.includes(element)) {
+  //     return null;
+  //   }
+  // }
+
   const handleFold = () => {
     Transforms.setNodes(
       editor,
@@ -56,7 +71,7 @@ const Wrapper = (
     );
   };
 
-  const indexes = foldedIndexes(editor.children);
+  const indexes = getFoldedIndexes(editor.children);
   const folded = indexes.has(path[0]);
 
   if (folded) {
@@ -117,7 +132,7 @@ export const renderWrapperContent = ({
       className={cn("wrapper", {
         dragging: isDragging,
         selected: handle,
-        dragOverlay: isDragOverlay
+        dragOverlay: isDragOverlay,
       })}
       style={
         {

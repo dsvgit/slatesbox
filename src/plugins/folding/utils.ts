@@ -1,4 +1,4 @@
-import { Descendant, Element } from "slate";
+import { Descendant, Editor, Element } from "slate";
 
 import {
   isHeading1Element,
@@ -33,7 +33,7 @@ export type SemanticNode = {
   children: SemanticNode[];
 };
 
-const ELEMENT_TO_SEMANTIC_PATH: WeakMap<Element, SemanticNode[]> =
+export const ELEMENT_TO_SEMANTIC_PATH: WeakMap<Element, SemanticNode[]> =
   new WeakMap();
 
 export const buildSemanticTree = (content: Descendant[]) => {
@@ -65,7 +65,7 @@ export const buildSemanticTree = (content: Descendant[]) => {
   return tree;
 };
 
-export const foldedIndexes = (content: Descendant[]) => {
+export const getFoldedIndexes = (content: Descendant[]) => {
   const indexes = new Set<number>();
   let index = 0;
   for (const element of content) {
@@ -90,4 +90,17 @@ export const foldedIndexes = (content: Descendant[]) => {
   }
 
   return indexes;
+};
+
+export const getSemanticChildren = (element: Descendant | null): Element[] => {
+  if (!element || !Element.isElement(element)) {
+    return [];
+  }
+
+  const semanticPath = ELEMENT_TO_SEMANTIC_PATH.get(element);
+  const semanticChildren = semanticPath
+    ? semanticPath[semanticPath.length - 1].children
+    : [];
+
+  return semanticChildren.map((x) => x.element);
 };
