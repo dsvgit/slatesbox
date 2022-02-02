@@ -26,8 +26,9 @@ import { Slate, Editable, withReact } from "slate-react";
 import { createPortal } from "react-dom";
 
 import { renderElementContent } from "hooks/useRenderElement";
-import { renderWrapperContent } from "plugins/wrapper";
+import { Item } from "plugins/wrapper";
 import { getSemanticChildren, isFoldingElement } from "plugins/folding/utils";
+import { DndStateProvider } from "hooks/useDndState";
 
 const clone = (x: object) => JSON.parse(JSON.stringify(x));
 
@@ -61,10 +62,10 @@ const DndPluginContext = ({
   const sensors = useSensors(
     useSensor(MouseSensor),
     useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 230,
-        tolerance: 10,
-      },
+      // activationConstraint: {
+      //   delay: 230,
+      //   tolerance: 10,
+      // },
     })
   );
 
@@ -107,50 +108,48 @@ const DndPluginContext = ({
   );
 
   return (
-    <DndContext
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onDragCancel={() => setActiveId(null)}
-      // modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-      sensors={sensors}
-      measuring={measuring}
-      autoScroll={{
-        threshold: {
-          x: 0.25,
-          y: 0.25,
-        },
-        acceleration: 18,
-        // activator: AutoScrollActivator.DraggableRect,
-        activator: AutoScrollActivator.Pointer,
-      }}
-    >
-      <SortableContext strategy={verticalListSortingStrategy} items={items}>
-        {children}
-      </SortableContext>
-      {createPortal(
-        <DragOverlay
-          adjustScale={false}
-          dropAnimation={{
-            duration: 0,
-            easing: "none",
-            dragSourceOpacity: 0,
-          }}
-          // modifiers={[adjustTranslate]}
-        >
-          {activeElement && Element.isElement(activeElement)
-            ? renderWrapperContent({
-                element: activeElement,
-                children: (
-                  <DragOverlayContent editor={editor} element={activeElement} />
-                ),
-                isDragOverlay: true,
-              })
-            : null}
-        </DragOverlay>,
-        document.body
-      )}
-    </DndContext>
+    <DndStateProvider value={{ activeId }}>
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={() => setActiveId(null)}
+        // modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+        sensors={sensors}
+        measuring={measuring}
+        autoScroll={{
+          threshold: {
+            x: 0.25,
+            y: 0.25,
+          },
+          acceleration: 18,
+          // activator: AutoScrollActivator.DraggableRect,
+          activator: AutoScrollActivator.Pointer,
+        }}
+      >
+        <SortableContext strategy={verticalListSortingStrategy} items={items}>
+          {children}
+        </SortableContext>
+        {createPortal(
+          <DragOverlay
+            adjustScale={false}
+            dropAnimation={{
+              duration: 0,
+              easing: "none",
+              dragSourceOpacity: 0,
+            }}
+            // modifiers={[adjustTranslate]}
+          >
+            {activeElement && Element.isElement(activeElement) ? (
+              <Item element={activeElement} isDragOverlay={true}>
+                <DragOverlayContent editor={editor} element={activeElement} />
+              </Item>
+            ) : null}
+          </DragOverlay>,
+          document.body
+        )}
+      </DndContext>
+    </DndStateProvider>
   );
 };
 

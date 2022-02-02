@@ -16,11 +16,15 @@ import { getFoldedIndexes, isFoldingElement } from "plugins/folding/utils";
 import { isImageElement } from "plugins/image/utils";
 import renderFoldingArrow from "plugins/folding/renderFoldingArrow";
 import renderDndHandle from "plugins/dnd/renderDndHandle";
+import useIntersectionObserver from "hooks/useIntersectionObserver";
+import { useIsomorphicLayoutEffect } from "@dnd-kit/utilities";
+import { useDndState } from "hooks/useDndState";
 
 const Wrapper = (
   props: Omit<RenderElementProps, "children"> & { children: React.ReactNode }
 ) => {
   const { attributes: slateAttributes, children, element } = props;
+  const { activeId } = useDndState();
 
   const editor = useSlate();
   const path = ReactEditor.findPath(editor, element);
@@ -35,21 +39,10 @@ const Wrapper = (
       )
     : false;
 
-  const {
-    attributes: sortableAttributes,
-    isDragging,
-    isSorting,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({
-    id,
-    transition: {
-      duration: 350,
-      easing: "ease",
-    },
-  });
+  const indexes = getFoldedIndexes(editor.children);
+  const folded = indexes.has(path[0]);
+
+  const isInViewport = useIntersectionObserver(slateAttributes.ref, [folded]);
 
   // const context = useDndContext();
   // if (context.active) {
@@ -71,9 +64,6 @@ const Wrapper = (
       }
     );
   };
-
-  const indexes = getFoldedIndexes(editor.children);
-  const folded = indexes.has(path[0]);
 
   if (folded) {
     return null;
@@ -103,29 +93,61 @@ const Wrapper = (
     // );
   }
 
-  return renderWrapperContent({
-    ref: (ref) => {
-      slateAttributes.ref.current = ref;
-      setNodeRef(ref);
-    },
-    element,
-    transition,
-    transform,
-    listeners,
-    isDragging,
-    isSorting,
-    handle: isFirstInSelection && isFocused,
-    attributes: {
-      ...slateAttributes,
-      ...sortableAttributes,
-    },
-    onFold: handleFold,
-    children,
-  });
+  return (
+    <div {...slateAttributes}>
+      {isInViewport || activeId === id ? (
+        <Sortable
+          id={id}
+          rootRef={slateAttributes.ref}
+          element={element}
+          handle={isFirstInSelection && isFocused}
+          onFold={handleFold}
+          isInViewport={isInViewport}
+          folded={folded}
+        >
+          {children}
+        </Sortable>
+      ) : (
+        <Item
+          element={element}
+          handle={isFirstInSelection && isFocused}
+          onFold={handleFold}
+          isInViewport={isInViewport}
+          folded={folded}
+        >
+          {children}
+        </Item>
+      )}
+    </div>
+  );
 };
 
-type RenderContentProps = {
-  ref?: React.Ref<HTMLDivElement>;
+const Sortable = ({
+  id,
+  rootRef,
+  ...props
+}: {
+  id: string;
+  rootRef: React.RefObject<HTMLDivElement>;
+} & ItemProps) => {
+  const sortableProps = useSortable({
+    id,
+    transition: {
+      duration: 350,
+      easing: "ease",
+    },
+  });
+
+  useIsomorphicLayoutEffect(() => {
+    sortableProps.setNodeRef(rootRef.current);
+  });
+
+  return <Item {...props} {...sortableProps} />;
+};
+
+type SortableAttributes = ReturnType<typeof useSortable>["attributes"];
+
+type ItemProps = {
   element: Element;
   transition?: string | null;
   transform?: Transform | null;
@@ -133,14 +155,15 @@ type RenderContentProps = {
   isDragging?: boolean;
   isSorting?: boolean;
   handle?: boolean;
-  attributes?: ReturnType<typeof useSortable>["attributes"] &
-    RenderElementProps["attributes"];
   onFold?: React.MouseEventHandler;
   isDragOverlay?: boolean;
+  isInViewport?: boolean;
+  folded?: boolean;
+  children: React.ReactNode;
+  attributes?: SortableAttributes;
 };
 
-export const renderWrapperContent = ({
-  ref,
+export const Item = ({
   element,
   children,
   transition,
@@ -149,20 +172,22 @@ export const renderWrapperContent = ({
   isDragging = false,
   isSorting = false,
   handle = false,
-  attributes,
   onFold,
   isDragOverlay = false,
-}: React.PropsWithChildren<RenderContentProps>) => {
+  isInViewport = false,
+  folded = false,
+  attributes,
+}: ItemProps) => {
   return (
     <div
       {...attributes}
-      ref={ref}
       className={cn("wrapper", {
         dragging: isDragging,
         selected: handle,
         dragOverlay: isDragOverlay,
         disableSelection: isIOS && isSorting,
         disableInteraction: isSorting,
+        hidden: folded,
         // indicator: isDragging,
       })}
       style={
@@ -178,13 +203,11 @@ export const renderWrapperContent = ({
       }
     >
       <div className="actions">
-        {!isMobile && renderDndHandle(listeners)}
+        {renderDndHandle(listeners)}
         {isFoldingElement(element) &&
           renderFoldingArrow(element.folded, onFold)}
       </div>
-      <div {...((isImageElement(element) || isMobile) && listeners)}>
-        {children}
-      </div>
+      {children}
     </div>
   );
 };

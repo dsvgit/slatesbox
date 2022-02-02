@@ -15,7 +15,7 @@ const initialValue: Descendant[] = [
   },
   {
     type: "h2",
-    folded: true,
+    folded: false,
     children: [{ text: "Etymology" }],
   },
   {
@@ -70,7 +70,7 @@ const initialValue: Descendant[] = [
   },
   {
     type: "h2",
-    folded: true,
+    folded: false,
     children: [{ text: "Modern depictions" }],
   },
   {
@@ -247,8 +247,17 @@ const simpleValue: Descendant[] = [
 const data = [
   // ...clone(simpleValue),
   ...clone(initialValue),
-  // ...clone(initialValue),
-  // ...clone(initialValue),
+  ...clone(initialValue),
+  ...clone(initialValue),
+  ...clone(initialValue),
+  ...clone(initialValue),
+  ...clone(initialValue),
+  ...clone(initialValue),
+  ...clone(initialValue),
+  ...clone(initialValue),
+  ...clone(initialValue),
+  ...clone(initialValue),
+  ...clone(initialValue),
 ];
 
 console.log(data.length);
