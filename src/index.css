@@ -75,6 +75,8 @@ body.grabbing {
 
 .wrapper.dragging:not(.dragOverlay) {
   opacity: 0.3;
+  border: 2px dotted #0177ff;
+  /*background-color: #08baff;*/
 }
 
 .wrapper.dragOverlay {
@@ -200,4 +202,11 @@ body.grabbing {
   right: 0;
   bottom: 0;
   content: " ";
+}
+
+.folded {
+  height: 0;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
 }

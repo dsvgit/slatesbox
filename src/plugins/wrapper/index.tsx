@@ -10,14 +10,13 @@ import type { Transform } from "@dnd-kit/utilities";
 import cn from "classnames";
 import { Editor, Path, Transforms, Element } from "slate";
 import type { DraggableSyntheticListeners } from "@dnd-kit/core";
-import { isMobile, isIOS } from "react-device-detect";
+import { isIOS } from "react-device-detect";
+import { useIsomorphicLayoutEffect } from "@dnd-kit/utilities";
 
-import { getFoldedIndexes, isFoldingElement } from "plugins/folding/utils";
-import { isImageElement } from "plugins/image/utils";
+import { isFoldedChild, isFoldingElement } from "plugins/folding/utils";
 import renderFoldingArrow from "plugins/folding/renderFoldingArrow";
 import renderDndHandle from "plugins/dnd/renderDndHandle";
 import useIntersectionObserver from "hooks/useIntersectionObserver";
-import { useIsomorphicLayoutEffect } from "@dnd-kit/utilities";
 import { useDndState } from "hooks/useDndState";
 
 const Wrapper = (
@@ -39,20 +38,9 @@ const Wrapper = (
       )
     : false;
 
-  const indexes = getFoldedIndexes(editor.children);
-  const folded = indexes.has(path[0]);
+  const folded = isFoldedChild(element);
 
   const isInViewport = useIntersectionObserver(slateAttributes.ref, [folded]);
-
-  // const context = useDndContext();
-  // if (context.active) {
-  //   const draggingElement = editor.children[Number(context.active.id)];
-  //   const semanticChildren = getSemanticChildren(editor, draggingElement);
-  //
-  //   if (semanticChildren.includes(element)) {
-  //     return null;
-  //   }
-  // }
 
   const handleFold = () => {
     Transforms.setNodes(
@@ -64,34 +52,6 @@ const Wrapper = (
       }
     );
   };
-
-  if (folded) {
-    return null;
-    // return (
-    //   <div
-    //     {...slateAttributes}
-    //     {...sortableAttributes}
-    //     ref={(ref) => {
-    //       slateAttributes.ref.current = ref;
-    //       setNodeRef(ref);
-    //     }}
-    //     style={
-    //       {
-    //         transition,
-    //         "--translate-x": transform
-    //           ? `${Math.round(transform.x)}px`
-    //           : undefined,
-    //         "--translate-y": transform
-    //           ? `${Math.round(transform.y)}px`
-    //           : undefined,
-    //       } as React.CSSProperties
-    //     }
-    //     contentEditable={false}
-    //   >
-    //     green
-    //   </div>
-    // );
-  }
 
   return (
     <div {...slateAttributes}>
@@ -187,7 +147,7 @@ export const Item = ({
         dragOverlay: isDragOverlay,
         disableSelection: isIOS && isSorting,
         disableInteraction: isSorting,
-        hidden: folded,
+        folded: folded,
         // indicator: isDragging,
       })}
       style={

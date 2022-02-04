@@ -4,10 +4,16 @@ import { SemanticNode } from "plugins/folding/utils";
 
 type EditorStateValue = {
   semanticTree: SemanticNode[];
+  droppableIntervals: [number, number][];
+  droppableStarts: Set<number>;
+  droppableEnds: Set<number>;
 };
 
 const EditorStateContext = createContext<EditorStateValue>({
   semanticTree: [],
+  droppableIntervals: [],
+  droppableStarts: new Set(),
+  droppableEnds: new Set(),
 });
 
 export const useEditorState = () => {

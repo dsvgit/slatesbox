@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { createEditor, Editor, Transforms, Descendant, Element } from "slate";
 import {
   AutoScrollActivator,
-  closestCenter,
   DndContext,
   DragEndEvent,
   DragOverlay,
@@ -29,6 +28,8 @@ import { renderElementContent } from "hooks/useRenderElement";
 import { Item } from "plugins/wrapper";
 import { getSemanticChildren, isFoldingElement } from "plugins/folding/utils";
 import { DndStateProvider } from "hooks/useDndState";
+import customCollisionDetection from "plugins/dnd/customCollisionDetection";
+import { useEditorState } from "hooks/useEditorState";
 
 const clone = (x: object) => JSON.parse(JSON.stringify(x));
 
@@ -57,7 +58,13 @@ const DndPluginContext = ({
   const [activeId, setActiveId] = useState<string | null>(null);
   const activeElement = activeId ? editor.children[Number(activeId)] : null;
 
+  const { droppableStarts, droppableEnds } = useEditorState();
   const items = editor.children.map((item, index) => index.toString());
+
+  const collisionDetection = useMemo(
+    () => customCollisionDetection(droppableStarts, droppableEnds),
+    [droppableStarts, droppableEnds]
+  );
 
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -110,7 +117,7 @@ const DndPluginContext = ({
   return (
     <DndStateProvider value={{ activeId }}>
       <DndContext
-        collisionDetection={closestCenter}
+        collisionDetection={collisionDetection}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={() => setActiveId(null)}

@@ -4,7 +4,10 @@ import { Slate, Editable, withReact, useSlate } from "slate-react";
 import { withHistory } from "slate-history";
 
 import { withImage } from "plugins/image/withImage";
-import { buildSemanticTree } from "plugins/folding/utils";
+import {
+  buildSemanticTree,
+  getDroppableIntervals,
+} from "plugins/folding/utils";
 import { EditorStateProvider } from "hooks/useEditorState";
 import initialValue from "initialValue";
 import DndPluginContext from "plugins/dnd/DndPluginContext";
@@ -32,23 +35,31 @@ const App = () => {
 const SlateContent = () => {
   const editor = useSlate();
 
-  const semanticTree = useMemo(
-    () => buildSemanticTree(editor.children),
-    [editor.children]
-  );
+  const editorState = useMemo(() => {
+    const semanticTree = buildSemanticTree(editor.children);
+    const droppableIntervals = getDroppableIntervals(
+      semanticTree,
+      editor.children.length
+    );
+    const droppableStarts = new Set(droppableIntervals.map((x) => x[0]));
+    const droppableEnds = new Set(droppableIntervals.map((x) => x[1]));
+
+    return {
+      semanticTree,
+      droppableIntervals,
+      droppableStarts,
+      droppableEnds,
+    };
+  }, [editor.children]);
 
   const renderElement = useRenderElement(editor);
 
   return (
-    <DndPluginContext editor={editor}>
-      <EditorStateProvider
-        value={{
-          semanticTree,
-        }}
-      >
+    <EditorStateProvider value={editorState}>
+      <DndPluginContext editor={editor}>
         <Editable className="editable" renderElement={renderElement} />
-      </EditorStateProvider>
-    </DndPluginContext>
+      </DndPluginContext>
+    </EditorStateProvider>
   );
 };
 

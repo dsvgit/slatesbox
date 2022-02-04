@@ -123,7 +123,27 @@ const simpleValue: Descendant[] = [
     ],
   },
   {
-    type: "h1",
+    type: "h3",
+    children: [{ text: "Second item" }],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 1",
+      },
+    ],
+  },
+  {
+    type: "p",
+    children: [
+      {
+        text: "Paragraph 2",
+      },
+    ],
+  },
+  {
+    type: "h3",
     children: [{ text: "Second item" }],
   },
   {
@@ -163,7 +183,7 @@ const simpleValue: Descendant[] = [
     ],
   },
   {
-    type: "h1",
+    type: "h2",
     children: [{ text: "Second item" }],
   },
   {
@@ -183,27 +203,7 @@ const simpleValue: Descendant[] = [
     ],
   },
   {
-    type: "h1",
-    children: [{ text: "Second item" }],
-  },
-  {
-    type: "p",
-    children: [
-      {
-        text: "Paragraph 1",
-      },
-    ],
-  },
-  {
-    type: "p",
-    children: [
-      {
-        text: "Paragraph 2",
-      },
-    ],
-  },
-  {
-    type: "h1",
+    type: "h2",
     children: [{ text: "Second item" }],
   },
   {
@@ -245,19 +245,19 @@ const simpleValue: Descendant[] = [
 ];
 
 const data = [
-  // ...clone(simpleValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
+  ...clone(simpleValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
+  // ...clone(initialValue),
 ];
 
 console.log(data.length);

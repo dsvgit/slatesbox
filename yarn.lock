@@ -8201,6 +8201,11 @@ tr46@^2.1.0:
   dependencies:
     punycode "^2.1.1"
 
+tree-crawl@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/tree-crawl/-/tree-crawl-1.1.0.tgz#3c5e704b59eec45eb8226ddd302a409d76cd28bb"
+  integrity sha512-pQfQTKBYEJhA3kIV8fL1rJJR8hgVzgX4u4IJi1EjnEch8BOUC+KQsuPMD6Pf017Sc8XD64WaA4q8840XhsIrIA==
+
 trim-repeated@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/trim-repeated/-/trim-repeated-1.0.0.tgz#e3646a2ea4e891312bf7eace6cfb05380bc01c21"

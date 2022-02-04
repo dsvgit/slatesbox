@@ -18,12 +18,14 @@ const definitions: [Element[], SemanticNode[]][] = [
     ],
     [
       {
+        index: 0,
         element: {
           type: Heading1Type,
           children: [],
         },
         children: [
           {
+            index: 1,
             element: {
               type: ParagraphType,
               children: [],
@@ -71,12 +73,14 @@ const definitions: [Element[], SemanticNode[]][] = [
     ],
     [
       {
+        index: 0,
         element: {
           type: Heading1Type,
           children: [],
         },
         children: [
           {
+            index: 1,
             element: {
               type: ParagraphType,
               children: [],
@@ -84,12 +88,14 @@ const definitions: [Element[], SemanticNode[]][] = [
             children: [],
           },
           {
+            index: 2,
             element: {
               type: Heading2Type,
               children: [],
             },
             children: [
               {
+                index: 3,
                 element: {
                   type: ParagraphType,
                   children: [],
@@ -101,12 +107,14 @@ const definitions: [Element[], SemanticNode[]][] = [
         ],
       },
       {
+        index: 4,
         element: {
           type: Heading1Type,
           children: [],
         },
         children: [
           {
+            index: 5,
             element: {
               type: ParagraphType,
               children: [],
@@ -114,12 +122,14 @@ const definitions: [Element[], SemanticNode[]][] = [
             children: [],
           },
           {
+            index: 6,
             element: {
               type: Heading2Type,
               children: [],
             },
             children: [
               {
+                index: 7,
                 element: {
                   type: ParagraphType,
                   children: [],
