@@ -1,6 +1,6 @@
 import React from "react";
 
-import { ImageElement } from "plugins/image/types";
+import { ImageElement } from "../types";
 import { ElementProps } from "plugins/types";
 
 const Image = (props: ElementProps & { element: ImageElement }) => {

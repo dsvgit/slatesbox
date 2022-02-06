@@ -9,6 +9,7 @@ import {
   Heading3Element,
 } from "plugins/heading/types";
 import { ImageElement } from "plugins/image/types";
+import { DividerElement } from "plugins/divider/types";
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
@@ -17,7 +18,8 @@ export type CustomElement =
   | Heading1Element
   | Heading2Element
   | Heading3Element
-  | ImageElement;
+  | ImageElement
+  | DividerElement;
 
 export type FormattedText = { text: string; bold?: true };
 

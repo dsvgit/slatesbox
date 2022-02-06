@@ -18,6 +18,8 @@ import Image from "plugins/image/components/Image";
 import { isParagraphElement } from "plugins/paragraph/utils";
 import Paragraph from "plugins/paragraph/components/Paragraph";
 import Wrapper from "plugins/wrapper";
+import { isDividerElement } from "plugins/divider/utils";
+import Divider from "plugins/divider/components/Divider";
 
 const useRenderElement = (editor: Editor) => {
   const renderElement = useCallback(
@@ -66,6 +68,10 @@ export const renderElementContent = (props: ElementProps) => {
 
   if (isImageElement(props.element)) {
     return <Image {...props} element={props.element} />;
+  }
+
+  if (isDividerElement(props.element)) {
+    return <Divider {...props} element={props.element} />;
   }
 
   if (isParagraphElement(props.element)) {

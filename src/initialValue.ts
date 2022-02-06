@@ -97,6 +97,10 @@ const initialValue: Descendant[] = [
       },
     ],
   },
+  {
+    type: "hr",
+    children: [{ text: ''}],
+  },
 ];
 
 const clone = (x: object) => JSON.parse(JSON.stringify(x));

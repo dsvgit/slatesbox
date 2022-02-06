@@ -1,5 +1,6 @@
 import { Editor, Element } from "slate";
-import { isImageElement } from "plugins/image/utils";
+
+import { isImageElement } from "./utils";
 
 export const withImage = (editor: Editor) => {
   const { isVoid } = editor;

@@ -12,12 +12,15 @@ import { EditorStateProvider } from "hooks/useEditorState";
 import initialValue from "initialValue";
 import DndPluginContext from "plugins/dnd/DndPluginContext";
 import useRenderElement from "hooks/useRenderElement";
+import { withDivider } from "plugins/divider/withDivider";
 
 const App = () => {
   // const editor = useMemo(() => withReact(createEditor()), []);
   const editorRef = useRef<Editor>();
   if (!editorRef.current) {
-    editorRef.current = withImage(withHistory(withReact(createEditor())));
+    editorRef.current = withDivider(
+      withImage(withHistory(withReact(createEditor())))
+    );
   }
   const editor = editorRef.current;
 

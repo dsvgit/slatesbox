@@ -6,7 +6,6 @@ import {
   DragEndEvent,
   DragOverlay,
   MeasuringStrategy,
-  Modifier,
   MouseSensor,
   TouchSensor,
   useSensor,
@@ -17,10 +16,6 @@ import {
   SortableContext,
 } from "@dnd-kit/sortable";
 import { DragStartEvent } from "@dnd-kit/core/dist/types";
-import {
-  restrictToVerticalAxis,
-  restrictToWindowEdges,
-} from "@dnd-kit/modifiers";
 import { Slate, Editable, withReact } from "slate-react";
 import { createPortal } from "react-dom";
 
@@ -43,14 +38,6 @@ type DndPluginContextProps = {
   editor: Editor;
 };
 
-// indicator support
-const adjustTranslate: Modifier = ({ transform }) => {
-  return {
-    ...transform,
-    y: transform.y - 25,
-  };
-};
-
 const DndPluginContext = ({
   editor,
   children,
@@ -66,15 +53,7 @@ const DndPluginContext = ({
     [droppableStarts, droppableEnds]
   );
 
-  const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor, {
-      // activationConstraint: {
-      //   delay: 230,
-      //   tolerance: 10,
-      // },
-    })
-  );
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
@@ -121,7 +100,6 @@ const DndPluginContext = ({
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={() => setActiveId(null)}
-        // modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
         sensors={sensors}
         measuring={measuring}
         autoScroll={{
@@ -130,7 +108,6 @@ const DndPluginContext = ({
             y: 0.25,
           },
           acceleration: 18,
-          // activator: AutoScrollActivator.DraggableRect,
           activator: AutoScrollActivator.Pointer,
         }}
       >
@@ -145,11 +122,10 @@ const DndPluginContext = ({
               easing: "none",
               dragSourceOpacity: 0,
             }}
-            // modifiers={[adjustTranslate]}
           >
             {activeElement && Element.isElement(activeElement) ? (
               <Item element={activeElement} isDragOverlay={true}>
-                <DragOverlayContent editor={editor} element={activeElement} />
+                <DragOverlayContent element={activeElement} />
               </Item>
             ) : null}
           </DragOverlay>,
@@ -162,19 +138,8 @@ const DndPluginContext = ({
 
 export default DndPluginContext;
 
-const DragOverlayContent = ({
-  editor,
-  element,
-}: {
-  editor: Editor;
-  element: Descendant;
-}) => {
+const DragOverlayContent = ({ element }: { element: Descendant }) => {
   const overlayEditor = useMemo(() => withReact(createEditor()), []);
-  const semanticChildren = getSemanticChildren(element);
-  // const content =
-  //   isFoldingElement(element) && element.folded
-  //     ? clone([element])
-  //     : clone([element, ...semanticChildren]);
   const content = clone([element]);
 
   useEffect(() => {
