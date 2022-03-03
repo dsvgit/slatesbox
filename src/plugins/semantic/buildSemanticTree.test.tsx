@@ -2,7 +2,7 @@ import { Element } from "slate";
 
 import { Heading1Type, Heading2Type } from "plugins/heading/types";
 import { ParagraphType } from "plugins/paragraph/types";
-import { buildSemanticTree, SemanticNode } from "plugins/folding/utils";
+import { buildSemanticTree, SemanticNode } from "plugins/semantic/utils";
 
 const definitions: [Element[], SemanticNode[]][] = [
   [

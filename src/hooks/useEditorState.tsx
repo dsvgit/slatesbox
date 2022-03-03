@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-import { SemanticNode } from "plugins/folding/utils";
+import { SemanticNode } from "plugins/semantic/utils";
 
 type EditorStateValue = {
   semanticTree: SemanticNode[];

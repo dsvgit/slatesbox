@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useIsomorphicLayoutEffect } from "@dnd-kit/utilities";
 
 const useIntersectionObserver = (ref: any, deps: any[] = []) => {
   const [isInViewport, setIsInViewport] = useState(false);
@@ -8,15 +9,15 @@ const useIntersectionObserver = (ref: any, deps: any[] = []) => {
     setIsInViewport(result);
   };
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!ref.current) {
       return;
     }
 
     const options = {
       root: null,
-      rootMargin: "0px",
-      threshold: 0.1,
+      rootMargin: "500px 0px",
+      threshold: 0,
     };
 
     const observer = new IntersectionObserver(handleChange, options);

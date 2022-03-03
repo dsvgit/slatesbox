@@ -9,7 +9,7 @@ const Divider = (props: ElementProps & { element: DividerElement }) => {
   return (
     <div contentEditable={false} {...attributes}>
       {children}
-      <hr  style={{ userSelect: "none" }} />
+      <hr style={{ userSelect: "none" }} />
     </div>
   );
 };

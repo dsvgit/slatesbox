@@ -5,7 +5,7 @@ import { ParagraphType } from "plugins/paragraph/types";
 import {
   buildSemanticTree,
   getDroppableIntervals,
-} from "plugins/folding/utils";
+} from "plugins/semantic/utils";
 
 const definitions: [Element[], [number, number][]][] = [
   [

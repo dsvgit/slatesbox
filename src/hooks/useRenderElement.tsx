@@ -80,7 +80,7 @@ export const renderElementContent = (props: ElementProps) => {
 
   return (
     <DefaultElement
-      children={props.element}
+      children={props.children}
       element={props.element}
       attributes={props.attributes!}
     />
