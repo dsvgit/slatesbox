@@ -7,7 +7,7 @@ import { withImage } from "plugins/image/withImage";
 import {
   buildSemanticTree,
   getDroppableIntervals,
-} from "plugins/folding/utils";
+} from "plugins/semantic/utils";
 import { EditorStateProvider } from "hooks/useEditorState";
 import initialValue from "initialValue";
 import DndPluginContext from "plugins/dnd/DndPluginContext";

@@ -21,7 +21,8 @@ import { createPortal } from "react-dom";
 
 import { renderElementContent } from "hooks/useRenderElement";
 import { Item } from "plugins/wrapper";
-import { getSemanticChildren, isFoldingElement } from "plugins/folding/utils";
+import { isFoldingElement } from "plugins/folding/utils";
+import { getSemanticChildren } from "plugins/semantic/utils";
 import { DndStateProvider } from "hooks/useDndState";
 import customCollisionDetection from "plugins/dnd/customCollisionDetection";
 import { useEditorState } from "hooks/useEditorState";

@@ -13,7 +13,8 @@ import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 import { isIOS } from "react-device-detect";
 import { useIsomorphicLayoutEffect } from "@dnd-kit/utilities";
 
-import { isFoldedChild, isFoldingElement } from "plugins/folding/utils";
+import { isFoldedChild } from "plugins/semantic/utils";
+import { isFoldingElement } from "plugins/folding/utils";
 import renderFoldingArrow from "plugins/folding/renderFoldingArrow";
 import renderDndHandle from "plugins/dnd/renderDndHandle";
 import useIntersectionObserver from "hooks/useIntersectionObserver";
