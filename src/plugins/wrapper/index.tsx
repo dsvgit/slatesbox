@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ReactEditor,
   RenderElementProps,
   useFocused,
-  useSlate,
+  useSelected,
+  useSlateStatic,
 } from "slate-react";
 import { useSortable } from "@dnd-kit/sortable";
 import type { Transform } from "@dnd-kit/utilities";
@@ -13,68 +14,129 @@ import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 import { isIOS } from "react-device-detect";
 import { useIsomorphicLayoutEffect } from "@dnd-kit/utilities";
 
-import { isFoldedChild } from "plugins/semantic/utils";
+import {
+  getSemanticChildren,
+  getSemanticDescendants, getSemanticPath,
+  isFoldedChild,
+} from "plugins/semantic/utils";
 import { isFoldingElement } from "plugins/folding/utils";
 import renderFoldingArrow from "plugins/folding/renderFoldingArrow";
 import renderDndHandle from "plugins/dnd/renderDndHandle";
-import useIntersectionObserver from "hooks/useIntersectionObserver";
 import { useDndState } from "hooks/useDndState";
+import useWrapperIntersectionObserver from "plugins/wrapper/useWrapperIntersectionObserver";
+import { isListItemElement } from "plugins/list/utils";
+import {foldElement, updateHash} from "plugins/folding/transforms";
+import { getClientRect } from "@dnd-kit/core";
 
 const Wrapper = (
   props: Omit<RenderElementProps, "children"> & { children: React.ReactNode }
 ) => {
-  const { attributes: slateAttributes, children, element } = props;
+  const { attributes, children, element } = props;
   const { activeId } = useDndState();
 
-  const editor = useSlate();
-  const path = ReactEditor.findPath(editor, element);
-  const index = path[0];
-  const id = String(index);
-  const isFocused = useFocused();
+  const editor = useSlateStatic();
+  const id = element.id!;
+  const selected = useSelected();
 
-  const isFirstInSelection = editor.selection
-    ? Path.equals(
-        Editor.edges(editor, editor.selection)[0].path.slice(0, 1),
-        path
-      )
-    : false;
+  const hidden = isFoldedChild(element);
 
-  const folded = isFoldedChild(element);
+  const [height, setHeight] = useState(0);
 
-  const isInViewport = useIntersectionObserver(slateAttributes.ref, [folded]);
+  useEffect(() => {
+    const semanticPath = getSemanticPath(element);
+
+    if (semanticPath) {
+      for (const semanticNode of semanticPath) {
+        updateHash(editor, semanticNode);
+      }
+    }
+
+    return () => {
+      const semanticPath = getSemanticPath(element);
+
+      if (semanticPath) {
+        for (const semanticNode of semanticPath) {
+          updateHash(editor, semanticNode);
+        }
+      }
+    };
+  }, [element.type]);
+
+  useEffect(() => {
+    try {
+      const semanticDescendants = getSemanticDescendants(element);
+
+      const sibling = semanticDescendants
+        ? semanticDescendants[semanticDescendants.length - 1]?.element
+        : null;
+
+      if (!sibling) {
+        return;
+      }
+
+      const elementDom = ReactEditor.toDOMNode(editor, element);
+      const siblingDom = ReactEditor.toDOMNode(editor, sibling);
+
+      const rect1 = getClientRect(elementDom);
+      const rect2 = getClientRect(siblingDom);
+
+      const height = rect2.top + rect2.height - rect1.top - 26;
+
+      setHeight(height);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [editor, element]);
+
+  const isInViewport = useWrapperIntersectionObserver(
+    attributes.ref,
+    activeId != null,
+    [hidden]
+  );
+
+  const sortableEnabled =
+    !hidden && (selected || isInViewport || activeId === element.id);
 
   const handleFold = () => {
-    Transforms.setNodes(
-      editor,
-      { folded: isFoldingElement(element) && !element.folded },
-      {
-        at: path,
-        match: (node) => node === element,
-      }
-    );
+    foldElement(editor, element);
   };
 
   return (
-    <div {...slateAttributes}>
-      {isInViewport || activeId === id ? (
+    <div {...attributes} style={{ position: "relative" }}>
+      {isListItemElement(element) &&
+        isFoldingElement(element) &&
+        !element.folded && (
+          <div
+            contentEditable={false}
+            className="list-line"
+            onClick={() => foldElement(editor, element)}
+            style={
+              {
+                "--spacing": `${22 * element.depth}px`,
+                "--height": `${height}px`,
+              } as React.CSSProperties
+            }
+          />
+        )}
+      {sortableEnabled ? (
         <Sortable
           id={id}
-          rootRef={slateAttributes.ref}
+          rootRef={attributes.ref}
           element={element}
-          handle={isFirstInSelection && isFocused}
+          handle={selected}
           onFold={handleFold}
           isInViewport={isInViewport}
-          folded={folded}
+          hidden={hidden}
         >
           {children}
         </Sortable>
       ) : (
         <Item
           element={element}
-          handle={isFirstInSelection && isFocused}
+          handle={selected}
           onFold={handleFold}
           isInViewport={isInViewport}
-          folded={folded}
+          hidden={hidden}
         >
           {children}
         </Item>
@@ -119,7 +181,7 @@ type ItemProps = {
   onFold?: React.MouseEventHandler;
   isDragOverlay?: boolean;
   isInViewport?: boolean;
-  folded?: boolean;
+  hidden?: boolean;
   children: React.ReactNode;
   attributes?: SortableAttributes;
 };
@@ -136,7 +198,7 @@ export const Item = ({
   onFold,
   isDragOverlay = false,
   isInViewport = false,
-  folded = false,
+  hidden = false,
   attributes,
 }: ItemProps) => {
   return (
@@ -148,7 +210,7 @@ export const Item = ({
         dragOverlay: isDragOverlay,
         disableSelection: isIOS && isSorting,
         disableInteraction: isSorting,
-        folded: folded,
+        hidden: hidden,
         // indicator: isDragging,
       })}
       style={
@@ -163,11 +225,10 @@ export const Item = ({
         } as React.CSSProperties
       }
     >
-      <div className="actions">
-        {renderDndHandle(listeners)}
-        {isFoldingElement(element) &&
-          renderFoldingArrow(element.folded, onFold)}
-      </div>
+      {renderDndHandle(listeners)}
+      {isFoldingElement(element) &&
+        !isListItemElement(element) &&
+        renderFoldingArrow(element.folded, onFold)}
       {children}
     </div>
   );

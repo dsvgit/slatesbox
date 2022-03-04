@@ -24,8 +24,7 @@ import { Item } from "plugins/wrapper";
 import { isFoldingElement } from "plugins/folding/utils";
 import { getSemanticChildren } from "plugins/semantic/utils";
 import { DndStateProvider } from "hooks/useDndState";
-import customCollisionDetection from "plugins/dnd/customCollisionDetection";
-import { useEditorState } from "hooks/useEditorState";
+import { sortableCollisionDetection } from "plugins/dnd/sortableCollisionDetection";
 
 const clone = (x: object) => JSON.parse(JSON.stringify(x));
 
@@ -44,14 +43,13 @@ const DndPluginContext = ({
   children,
 }: React.PropsWithChildren<DndPluginContextProps>) => {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const activeElement = activeId ? editor.children[Number(activeId)] : null;
 
-  const { droppableStarts, droppableEnds } = useEditorState();
-  const items = editor.children.map((item, index) => index.toString());
-
-  const collisionDetection = useMemo(
-    () => customCollisionDetection(droppableStarts, droppableEnds),
-    [droppableStarts, droppableEnds]
+  const items = useMemo(
+    () =>
+      editor.children
+        .map((item) => (Element.isElement(item) ? item.id : undefined))
+        .filter(Boolean) as string[],
+    [editor.children]
   );
 
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
@@ -71,20 +69,25 @@ const DndPluginContext = ({
       const { active, over } = event;
 
       if (over) {
-        const activeIndex = Number(active.id);
-        const overIndex = Number(over.id);
-        if (activeIndex !== overIndex) {
-          const activeElement = editor.children[activeIndex];
+        let overIndex = over.data.current?.sortable.index;
+        if (active.id !== over.id) {
+          const activeElement = editor.children.find(
+            (x) => Element.isElement(x) && x.id === active.id
+          )!;
           const semanticChildren = getSemanticChildren(activeElement);
 
           Transforms.moveNodes(editor, {
             at: [],
-            match: (node) =>
-              node === activeElement ||
-              (isFoldingElement(activeElement) &&
-                Boolean(activeElement.folded) &&
-                Element.isElement(node) &&
-                semanticChildren.includes(node)),
+            match: (node) => {
+              return (
+                node === activeElement ||
+                (isFoldingElement(activeElement) &&
+                  Boolean(activeElement.folded) &&
+                  Element.isElement(node) &&
+                  semanticChildren.includes(node))
+              );
+            },
+
             to: [overIndex],
           });
         }
@@ -95,9 +98,16 @@ const DndPluginContext = ({
   );
 
   return (
-    <DndStateProvider value={{ activeId }}>
+    <DndStateProvider
+      value={useMemo(
+        () => ({
+          activeId,
+        }),
+        [activeId]
+      )}
+    >
       <DndContext
-        collisionDetection={collisionDetection}
+        collisionDetection={sortableCollisionDetection}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragCancel={() => setActiveId(null)}
@@ -124,9 +134,22 @@ const DndPluginContext = ({
               dragSourceOpacity: 0,
             }}
           >
-            {activeElement && Element.isElement(activeElement) ? (
-              <Item element={activeElement} isDragOverlay={true}>
-                <DragOverlayContent element={activeElement} />
+            {activeId ? (
+              <Item
+                element={
+                  editor.children.find(
+                    (x) => Element.isElement(x) && x.id === activeId
+                  )! as Element
+                }
+                isDragOverlay={true}
+              >
+                <DragOverlayContent
+                  element={
+                    editor.children.find(
+                      (x) => Element.isElement(x) && x.id === activeId
+                    )!
+                  }
+                />
               </Item>
             ) : null}
           </DragOverlay>,

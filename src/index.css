@@ -52,8 +52,6 @@ body.grabbing {
 
 .wrapper {
   position: relative;
-  transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)
-    scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));
   transform-origin: 0 0;
   touch-action: manipulation;
 
@@ -64,6 +62,12 @@ body.grabbing {
   z-index: 0;
   outline: none;
   /*will-change: transform;*/
+}
+
+.wrapper {
+  transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)
+    scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));
+  z-index: 0;
 }
 
 .wrapper.dragging {
@@ -91,18 +95,6 @@ body.grabbing {
   box-shadow: 0px 0px 13px 2px rgba(34, 60, 80, 0.2);
 }
 
-.actions {
-  position: absolute;
-  top: 0;
-  left: -47px;
-  width: 47px;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-
-  /*background-color: red;*/
-}
-
 @media only screen and (max-width: 768px) {
   .actions {
     /*left: -20px;*/
@@ -111,6 +103,8 @@ body.grabbing {
 }
 
 .handle {
+  position: absolute;
+  left: -50px;
   user-select: none;
   background: none;
   border: none;
@@ -120,7 +114,6 @@ body.grabbing {
   color: lightslategray;
   height: 100%;
   padding: 0;
-  flex: 1;
 
   /*background-color: blue;*/
 }
@@ -142,14 +135,16 @@ body.grabbing {
 }
 
 .folding {
-  cursor: inherit;
+  position: absolute;
+  left: -20px;
+  top: 24px;
+  cursor: pointer;
   user-select: none;
   background: none;
   border: none;
   font-size: 18px;
   color: lightslategray;
   padding: 0;
-  flex: 1;
 
   /*background-color: green;*/
 }
@@ -204,9 +199,101 @@ body.grabbing {
   content: " ";
 }
 
-.folded {
+.hidden {
   height: 0;
   overflow: hidden;
   padding: 0;
   margin: 0;
+}
+
+.list-item {
+  position: relative;
+  margin-left: -26px;
+  list-style: none;
+  padding-left: var(--spacing);
+}
+
+.list-item:not(.hasChildren) .folding-pointer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.folding-pointer {
+  cursor: pointer;
+  float: left;
+  font-size: 12px;
+  background: none;
+  border: none;
+  margin-top: 4px;
+  margin-left: 2px;
+  user-select: none;
+}
+
+.pointer {
+  float: left;
+  min-width: 18px;
+  cursor: pointer;
+  transform: rotate(0deg);
+
+  background: none;
+  border: none;
+  user-select: none;
+}
+
+.checkbox-pointer {
+  float: left;
+  margin-top: 3px;
+  user-select: none;
+}
+
+.list-item .folding-pointer:hover,
+.list-item.folded .folding-pointer {
+  transition: 300ms transform;
+  transform: rotate(-90deg);
+}
+
+.list-item:not(.folded) .folding-pointer:hover {
+  transform: rotate(0deg);
+}
+
+.list-item-numbered .pointer::before {
+  content: var(--pointer-content) ".";
+}
+
+.list-item-bulleted .pointer::before {
+  content: var(--pointer-content);
+  font-size: 8px;
+  vertical-align: middle;
+}
+
+.list-line {
+  user-select: none;
+  position: absolute;
+  width: 20px;
+  height: var(--height);
+  top: 26px;
+  left: calc(-15px + var(--spacing));
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.list-line::before {
+  width: 2px;
+  height: 100%;
+  background-color: gray;
+  display: block;
+  content: '';
+  margin-left: 10px;
+  transition: 200ms box-shadow, 200ms background-color;
+}
+
+.list-line:hover::before {
+  background-color:  #0177ff;
+  box-shadow: 0 0 1px #0177ff;
+}
+
+.toolbar-button {
+  background: none;
+  border: none;
+  cursor: pointer;
 }

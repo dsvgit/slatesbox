@@ -10,6 +10,7 @@ import {
 } from "plugins/heading/types";
 import { ImageElement } from "plugins/image/types";
 import { DividerElement } from "plugins/divider/types";
+import { ListItemElement } from "plugins/list/types";
 
 export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
@@ -19,7 +20,8 @@ export type CustomElement =
   | Heading2Element
   | Heading3Element
   | ImageElement
-  | DividerElement;
+  | DividerElement
+  | ListItemElement;
 
 export type FormattedText = { text: string; bold?: true };
 
@@ -28,7 +30,7 @@ export type CustomText = FormattedText;
 declare module "slate" {
   interface CustomTypes {
     Editor: CustomEditor;
-    Element: CustomElement;
+    Element: CustomElement & { id?: string; hash?: string };
     Text: CustomText;
   }
 }

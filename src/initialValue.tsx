@@ -1,4 +1,8 @@
 import { Descendant } from "slate";
+import { ListTypes } from "plugins/list/types";
+import { assignIdRecursively } from "plugins/nodeId/withNodeId";
+
+const clone = (x: object) => JSON.parse(JSON.stringify(x));
 
 const initialValue: Descendant[] = [
   {
@@ -99,11 +103,9 @@ const initialValue: Descendant[] = [
   },
   {
     type: "hr",
-    children: [{ text: ''}],
+    children: [{ text: "" }],
   },
 ];
-
-const clone = (x: object) => JSON.parse(JSON.stringify(x));
 
 const simpleValue: Descendant[] = [
   {
@@ -248,22 +250,125 @@ const simpleValue: Descendant[] = [
   },
 ];
 
-const data = [
-  // ...clone(simpleValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
-  ...clone(initialValue),
+const listValue: Descendant[] = [
+  {
+    type: "h1",
+    children: [{ text: "Today" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.Bulleted,
+    depth: 0,
+    children: [{ text: "Feed cat" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Rinse bowl" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Open cat food" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Mix dry and wet food in bowl" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Deliver on a silver platter to Pixel" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.Bulleted,
+    depth: 0,
+    children: [{ text: "Wash car" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Vacuum interior" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Wash exterior" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Wax exterior" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.Bulleted,
+    depth: 0,
+    children: [{ text: "Grocery shopping" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Plan meals" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Clean out fridge" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Make list" }],
+  },
+  {
+    type: "list_item",
+    listType: ListTypes.TodoList,
+    depth: 1,
+    checked: false,
+    children: [{ text: "Go to store" }],
+  },
 ];
 
-console.log(data.length);
+const pValue: Descendant[] = [
+  {
+    type: "p",
+    children: [{ text: "First item" }],
+  },
+  {
+    type: "p",
+    children: [{ text: "First item" }],
+  },
+  {
+    type: "p",
+    children: [{ text: "First item" }],
+  },
+];
+
+const data = [...listValue];
+
+data.forEach(assignIdRecursively);
 
 export default data;

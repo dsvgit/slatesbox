@@ -5,7 +5,7 @@ const renderFoldingArrow = (
   onFold?: React.MouseEventHandler
 ) => {
   return (
-    <button contentEditable={false} className="folding" onClick={onFold}>
+    <button contentEditable={false} className="folding" onMouseDown={onFold}>
       <div
         style={
           {

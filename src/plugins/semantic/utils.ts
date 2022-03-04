@@ -1,8 +1,13 @@
-import {Descendant, Element} from "slate";
+import { Descendant, Element } from "slate";
 import crawl from "tree-crawl";
 
-import {isHeading1Element, isHeading2Element, isHeading3Element,} from "plugins/heading/utils";
-import {isFoldingElement} from "plugins/folding/utils";
+import {
+  isHeading1Element,
+  isHeading2Element,
+  isHeading3Element,
+} from "plugins/heading/utils";
+import { isFoldingElement } from "plugins/folding/utils";
+import { isListItemElement } from "plugins/list/utils";
 
 const getSemanticLevel = (element: Element) => {
   if (isHeading1Element(element)) {
@@ -17,7 +22,15 @@ const getSemanticLevel = (element: Element) => {
     return 3;
   }
 
-  return 999;
+  return Infinity;
+};
+
+const compareLevels = (a: Element, b: Element) => {
+  if (isListItemElement(a) && isListItemElement(b)) {
+    return Math.sign(a.depth - b.depth);
+  }
+
+  return Math.sign(getSemanticLevel(a) - getSemanticLevel(b));
 };
 
 export type SemanticNode = {
@@ -39,11 +52,10 @@ export const buildSemanticTree = (content: Descendant[]) => {
       continue;
     }
 
-    const level = getSemanticLevel(element);
-
     const edgeIndex = path.findIndex(
-      (p) => getSemanticLevel(p.element) >= level
+      (p) => compareLevels(p.element, element) !== -1
     );
+
     if (edgeIndex !== -1) {
       path.splice(edgeIndex);
     }
@@ -56,6 +68,7 @@ export const buildSemanticTree = (content: Descendant[]) => {
     const children = parent ? parent.children : tree;
 
     children.push(last);
+
     index++;
   }
 
@@ -89,7 +102,25 @@ export const crawlSemanticTree = (
     return;
   }
 
-  crawl<SemanticNode>({ children: semanticTree } as SemanticNode, fn, {});
+  crawl<SemanticNode>(
+    { children: semanticTree } as SemanticNode,
+    (node, context) => {
+      if (node.element != null) {
+        fn(node, context);
+      }
+    },
+    {}
+  );
+};
+
+export const getSemanticPath = (element: Element) => {
+  if (!Element.isElement(element)) {
+    return false;
+  }
+
+  const semanticPath = ELEMENT_TO_SEMANTIC_PATH.get(element)!;
+
+  return semanticPath;
 };
 
 export const getDroppableIntervals = (
@@ -128,4 +159,26 @@ export const getSemanticChildren = (element: Descendant | null): Element[] => {
     : [];
 
   return semanticChildren.map((x) => x.element);
+};
+
+export const getSemanticDescendants = (
+  element: Descendant | null
+): SemanticNode[] | null => {
+  if (!element || !Element.isElement(element)) {
+    return [];
+  }
+
+  const semanticPath = ELEMENT_TO_SEMANTIC_PATH.get(element);
+
+  if (!semanticPath) {
+    return null;
+  }
+
+  const semanticNode = semanticPath[semanticPath.length - 1];
+  const result: SemanticNode[] = [];
+  crawlSemanticTree([...semanticNode.children], (node) => {
+    result.push(node);
+  });
+
+  return result;
 };

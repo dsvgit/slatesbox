@@ -20,6 +20,8 @@ import Paragraph from "plugins/paragraph/components/Paragraph";
 import Wrapper from "plugins/wrapper";
 import { isDividerElement } from "plugins/divider/utils";
 import Divider from "plugins/divider/components/Divider";
+import { isListItemElement } from "plugins/list/utils";
+import ListItem from "plugins/list/components/ListItem";
 
 const useRenderElement = (editor: Editor) => {
   const renderElement = useCallback(
@@ -68,6 +70,10 @@ export const renderElementContent = (props: ElementProps) => {
 
   if (isImageElement(props.element)) {
     return <Image {...props} element={props.element} />;
+  }
+
+  if (isListItemElement(props.element)) {
+    return <ListItem {...props} element={props.element} />;
   }
 
   if (isDividerElement(props.element)) {
