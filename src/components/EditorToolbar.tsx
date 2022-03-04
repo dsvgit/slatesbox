@@ -57,13 +57,6 @@ const EditorToolbar = () => {
       </button>
 
       <button
-        onClick={() => toggleList(editor, { listType: ListTypes.Bulleted })}
-        className="toolbar-button"
-      >
-        <ListUnorderedIcon />
-      </button>
-
-      <button
         onClick={() => toggleList(editor, { listType: ListTypes.Numbered })}
         className="toolbar-button"
       >
