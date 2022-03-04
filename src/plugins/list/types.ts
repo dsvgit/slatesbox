@@ -1,6 +1,6 @@
 import { Descendant } from "slate";
 
-import { FoldingElement } from "plugins/folding/types";
+import {FoldingElement} from "slate-extended/types";
 
 export type ListItemType = "list_item";
 export const ListItemType: ListItemType = "list_item";

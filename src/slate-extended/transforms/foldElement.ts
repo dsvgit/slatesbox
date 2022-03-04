@@ -1,18 +1,13 @@
-import { Editor, Transforms, Element, Range } from "slate";
+import { Editor, Element, Range, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
-import { nanoid } from "nanoid";
-
-import {
-  getSemanticDescendants,
-  getSemanticPath,
-  SemanticNode,
-} from "plugins/semantic/utils";
-import { isFoldingElement } from "plugins/folding/utils";
+import { ExtendedEditor } from "slate-extended/extendedEditor";
+import { isFoldingElement } from "slate-extended/utils";
+import { updateHash } from "slate-extended/transforms/updateHash";
 
 export const foldElement = (editor: Editor, element: Element) => {
   const path = ReactEditor.findPath(editor, element);
-  const semanticDescendants = getSemanticDescendants(element);
-  const semanticPath = getSemanticPath(element);
+  const semanticDescendants = ExtendedEditor.semanticDescendants(element);
+  const semanticPath = ExtendedEditor.semanticPath(element);
 
   if (isFoldingElement(element)) {
     Editor.withoutNormalizing(editor, () => {
@@ -48,30 +43,13 @@ export const foldElement = (editor: Editor, element: Element) => {
         }
       );
 
-      if (semanticDescendants) {
-        for (const semanticNode of semanticDescendants) {
-          updateHash(editor, semanticNode);
-        }
+      for (const semanticNode of semanticDescendants) {
+        updateHash(editor, semanticNode);
       }
 
-      if (semanticPath) {
-        for (const semanticNode of semanticPath) {
-          updateHash(editor, semanticNode);
-        }
+      for (const semanticNode of semanticPath) {
+        updateHash(editor, semanticNode);
       }
     });
   }
-};
-
-export const updateHash = (editor: Editor, semanticNode: SemanticNode) => {
-  const { element, index } = semanticNode;
-
-  Transforms.setNodes(
-    editor,
-    { hash: nanoid(4) },
-    {
-      at: [index],
-      match: (node) => node === element,
-    }
-  );
 };

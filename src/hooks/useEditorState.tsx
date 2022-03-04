@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-import { SemanticNode } from "plugins/semantic/utils";
+import {SemanticNode} from "slate-extended/types";
 
 type EditorStateValue = {
   semanticTree: SemanticNode[];

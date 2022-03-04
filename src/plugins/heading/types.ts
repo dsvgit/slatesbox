@@ -1,5 +1,5 @@
 import { Descendant } from "slate";
-import { FoldingElement } from "plugins/folding/types";
+import {FoldingElement} from "slate-extended/types";
 
 export type Heading1Type = "h1";
 export const Heading1Type: Heading1Type = "h1";

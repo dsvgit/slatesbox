@@ -11,8 +11,13 @@ import {
 import { ImageElement } from "plugins/image/types";
 import { DividerElement } from "plugins/divider/types";
 import { ListItemElement } from "plugins/list/types";
+import { ExtendedEditor } from "slate-extended/extendedEditor";
+import { HashedElement, IdentityElement } from "slate-extended/types";
 
-export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
+export type CustomEditor = BaseEditor &
+  ReactEditor &
+  HistoryEditor &
+  ExtendedEditor;
 
 export type CustomElement =
   | ParagraphElement
@@ -30,7 +35,7 @@ export type CustomText = FormattedText;
 declare module "slate" {
   interface CustomTypes {
     Editor: CustomEditor;
-    Element: CustomElement & { id?: string; hash?: string };
+    Element: CustomElement & IdentityElement & HashedElement;
     Text: CustomText;
   }
 }

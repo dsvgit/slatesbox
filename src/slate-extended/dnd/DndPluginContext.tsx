@@ -21,12 +21,9 @@ import { createPortal } from "react-dom";
 
 import { renderElementContent } from "hooks/useRenderElement";
 import { Item } from "plugins/wrapper";
-import { isFoldingElement } from "plugins/folding/utils";
-import { getSemanticChildren } from "plugins/semantic/utils";
 import { DndStateProvider } from "hooks/useDndState";
-import { sortableCollisionDetection } from "plugins/dnd/sortableCollisionDetection";
-
-const clone = (x: object) => JSON.parse(JSON.stringify(x));
+import { sortableCollisionDetection } from "slate-extended/dnd/sortableCollisionDetection";
+import { moveDndElements } from "slate-extended/transforms/moveDndElements";
 
 const measuring = {
   droppable: {
@@ -73,23 +70,9 @@ const DndPluginContext = ({
         if (active.id !== over.id) {
           const activeElement = editor.children.find(
             (x) => Element.isElement(x) && x.id === active.id
-          )!;
-          const semanticChildren = getSemanticChildren(activeElement);
+          )! as Element;
 
-          Transforms.moveNodes(editor, {
-            at: [],
-            match: (node) => {
-              return (
-                node === activeElement ||
-                (isFoldingElement(activeElement) &&
-                  Boolean(activeElement.folded) &&
-                  Element.isElement(node) &&
-                  semanticChildren.includes(node))
-              );
-            },
-
-            to: [overIndex],
-          });
+          moveDndElements(editor, activeElement, overIndex);
         }
       }
       setActiveId(null);
@@ -164,7 +147,7 @@ export default DndPluginContext;
 
 const DragOverlayContent = ({ element }: { element: Descendant }) => {
   const overlayEditor = useMemo(() => withReact(createEditor()), []);
-  const content = clone([element]);
+  const content = [element];
 
   useEffect(() => {
     document.body.classList.add("grabbing");

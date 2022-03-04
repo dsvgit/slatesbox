@@ -12,3 +12,5 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById("root")
 );
+export {updateHash} from "slate-extended/transforms/updateHash";
+export {foldElement} from "slate-extended/transforms/foldElement";

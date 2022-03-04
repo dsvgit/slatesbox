@@ -57,6 +57,7 @@ body.grabbing {
 
   padding: 3px;
   margin: 5px;
+  padding-left: var(--spacing);
   /*border: 1px solid lightslategrey;*/
   background-color: white;
   z-index: 0;
@@ -136,8 +137,8 @@ body.grabbing {
 
 .folding {
   position: absolute;
-  left: -20px;
-  top: 24px;
+  top: 3px;
+  left: calc(-6px + var(--spacing));
   cursor: pointer;
   user-select: none;
   background: none;
@@ -145,6 +146,7 @@ body.grabbing {
   font-size: 18px;
   color: lightslategray;
   padding: 0;
+
 
   /*background-color: green;*/
 }
@@ -208,14 +210,7 @@ body.grabbing {
 
 .list-item {
   position: relative;
-  margin-left: -26px;
   list-style: none;
-  padding-left: var(--spacing);
-}
-
-.list-item:not(.hasChildren) .folding-pointer {
-  visibility: hidden;
-  pointer-events: none;
 }
 
 .folding-pointer {
@@ -272,7 +267,7 @@ body.grabbing {
   width: 20px;
   height: var(--height);
   top: 26px;
-  left: calc(-15px + var(--spacing));
+  left: calc(4px + var(--spacing));
   z-index: 1000;
   cursor: pointer;
 }
@@ -282,13 +277,13 @@ body.grabbing {
   height: 100%;
   background-color: gray;
   display: block;
-  content: '';
+  content: "";
   margin-left: 10px;
   transition: 200ms box-shadow, 200ms background-color;
 }
 
 .list-line:hover::before {
-  background-color:  #0177ff;
+  background-color: #0177ff;
   box-shadow: 0 0 1px #0177ff;
 }
 

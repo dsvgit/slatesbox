@@ -7,11 +7,6 @@ import { MutableRefObject } from "react";
 
 declare type DataRef = MutableRefObject<Record<string, any> | undefined>;
 
-export type Coordinates = {
-  x: number;
-  y: number;
-};
-
 export function sortCollisionsAsc(
   { data: { value: a } }: CollisionDescriptor,
   { data: { value: b } }: CollisionDescriptor
@@ -36,8 +31,6 @@ export function sortCollisionsByIndex(
 ) {
   return a.data.current?.sortable.index - b.data.current?.sortable.index;
 }
-
-const getSign = (a: number, b: number) => ((a >= 0 ? b >= 0 : b < 0) ? 1 : -1);
 
 export const sortableCollisionDetectionAlgorithm = (
   activeIndex: number,
