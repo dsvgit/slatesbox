@@ -101,8 +101,6 @@ h3 {
 .item.dragging {
   z-index: 1;
   background-color: rgba(255, 255, 255, 0.3);
-  --scale-x: 1.04;
-  --scale-y: 1.04;
 }
 
 body.dragging .item {
@@ -112,8 +110,12 @@ body.dragging .item {
 
 .item.dragging:not(.dragOverlay) {
   opacity: 0.3;
-  border: 2px dotted #0177ff;
-  /*background-color: #08baff;*/
+  /*border: 2px dotted #0177ff;*/
+  background-color: #08baff;
+}
+
+.item.dragging:not(.dragOverlay) > * {
+  visibility: hidden;
 }
 
 .item.dragOverlay {
