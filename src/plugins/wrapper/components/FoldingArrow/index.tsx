@@ -1,6 +1,7 @@
 import React, { memo, useEffect, useState } from "react";
 import { Element } from "slate";
 import { useSlate } from "slate-react";
+import cn from "classnames";
 
 import { isFoldingElement } from "slate-extended/utils";
 import { isListItemElement } from "plugins/list/utils";
@@ -26,7 +27,7 @@ const FoldingArrow = (props: Props & { element: Element }) => {
     return (
       <FoldingArrowMemoized
         folded={Boolean(element.folded)}
-        depth={isListItemElement(element) ? element.depth : 0}
+        isList={isListItemElement(element)}
         onFold={onFold}
       />
     );
@@ -36,11 +37,15 @@ const FoldingArrow = (props: Props & { element: Element }) => {
 };
 
 const FoldingArrowMemoized = memo(
-  (props: Props & { depth: number; folded: boolean }) => {
-    const { depth, folded, onFold } = props;
+  (props: Props & { isList: boolean; folded: boolean }) => {
+    const { isList, folded, onFold } = props;
 
     return (
-      <button contentEditable={false} className="folding" onMouseDown={onFold}>
+      <button
+        contentEditable={false}
+        className={cn("folding", { "folding-list": isList, folded: folded })}
+        onMouseDown={onFold}
+      >
         <div
           style={
             {

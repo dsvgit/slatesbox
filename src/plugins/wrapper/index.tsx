@@ -45,7 +45,6 @@ const Wrapper = (
 
   return (
     <div {...attributes} className="item-container">
-      <FoldingLine element={element} onFold={handleFold} />
       {sortableEnabled ? (
         <Sortable id={id} {...itemProps}>
           {children}

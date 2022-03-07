@@ -22,49 +22,70 @@ const EditorToolbar = () => {
   return (
     <div style={{ marginBottom: 18 }}>
       <button
-        onClick={() => toggleElement(editor, ParagraphType)}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          toggleElement(editor, ParagraphType);
+        }}
         className="toolbar-button"
       >
         P
       </button>
 
       <button
-        onClick={() => toggleElement(editor, Heading1Type)}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          toggleElement(editor, Heading1Type);
+        }}
         className="toolbar-button"
       >
         H1
       </button>
 
       <button
-        onClick={() => toggleElement(editor, Heading2Type)}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          toggleElement(editor, Heading2Type);
+        }}
         className="toolbar-button"
       >
         H2
       </button>
 
       <button
-        onClick={() => toggleElement(editor, Heading3Type)}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          toggleElement(editor, Heading3Type);
+        }}
         className="toolbar-button"
       >
         H3
       </button>
 
       <button
-        onClick={() => toggleList(editor, { listType: ListTypes.Bulleted })}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          toggleList(editor, { listType: ListTypes.Bulleted });
+        }}
         className="toolbar-button"
       >
         <ListUnorderedIcon />
       </button>
 
       <button
-        onClick={() => toggleList(editor, { listType: ListTypes.Numbered })}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          toggleList(editor, { listType: ListTypes.Numbered });
+        }}
         className="toolbar-button"
       >
         <ListOrderedIcon />
       </button>
 
       <button
-        onClick={() => toggleList(editor, { listType: ListTypes.TodoList })}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          toggleList(editor, { listType: ListTypes.TodoList });
+        }}
         className="toolbar-button"
       >
         <TasklistIcon />

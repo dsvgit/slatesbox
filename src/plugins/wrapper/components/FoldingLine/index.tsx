@@ -68,7 +68,6 @@ const FoldingLineMemoized = memo(
         onClick={onFold}
         style={
           {
-            "--spacing": `${22 * depth}px`,
             "--height": `${height}px`,
           } as React.CSSProperties
         }

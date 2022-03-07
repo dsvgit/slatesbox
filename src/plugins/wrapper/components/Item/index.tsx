@@ -9,6 +9,7 @@ import { DraggableSyntheticListeners } from "@dnd-kit/core";
 
 import FoldingArrow from "plugins/wrapper/components/FoldingArrow";
 import DragHandle from "plugins/wrapper/components/DragHandle";
+import FoldingLine from "plugins/wrapper/components/FoldingLine";
 
 type SortableAttributes = ReturnType<typeof useSortable>["attributes"];
 export type ItemProps = {
@@ -58,14 +59,15 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
           disableSelection: isIOS && isSorting,
           disableInteraction: isSorting,
           hidden: hidden,
+          "item-list": isListItemElement(element),
           // indicator: isDragging,
         })}
         style={
           {
             transition,
             "--spacing": isListItemElement(element)
-              ? `${22 * element.depth}px`
-              : 0,
+              ? `${38 * element.depth}px`
+              : "0px",
             "--translate-x": transform
               ? `${Math.round(transform.x)}px`
               : undefined,
@@ -75,6 +77,7 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
           } as React.CSSProperties
         }
       >
+        <FoldingLine element={element} onFold={onFold} />
         <FoldingArrow element={element} onFold={onFold} />
         {children}
       </div>

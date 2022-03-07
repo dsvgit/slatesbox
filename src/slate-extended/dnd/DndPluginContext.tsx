@@ -58,6 +58,7 @@ const DndPluginContext = ({
       return;
     }
 
+    document.body.classList.add("dragging");
     setActiveId(active.id);
   }, []);
 
@@ -75,6 +76,8 @@ const DndPluginContext = ({
           moveDndElements(editor, activeElement, overIndex);
         }
       }
+
+      document.body.classList.remove("dragging");
       setActiveId(null);
     },
     [editor]
@@ -148,14 +151,6 @@ export default DndPluginContext;
 const DragOverlayContent = ({ element }: { element: Descendant }) => {
   const overlayEditor = useMemo(() => withReact(createEditor()), []);
   const content = [element];
-
-  useEffect(() => {
-    document.body.classList.add("grabbing");
-
-    return () => {
-      document.body.classList.remove("grabbing");
-    };
-  }, []);
 
   return (
     <div contentEditable={false}>

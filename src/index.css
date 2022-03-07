@@ -22,7 +22,7 @@ button {
   box-sizing: border-box;
 }
 
-body.grabbing {
+body.dragging {
   cursor: grabbing;
 }
 
@@ -42,7 +42,9 @@ body.grabbing {
   }
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   padding-top: 4px;
   padding-bottom: 4px;
   margin: 0;
@@ -70,15 +72,20 @@ h1, h2, h3 {
   touch-action: manipulation;
 
   padding: 3px;
-  padding-left: 40px;
+  padding-left: calc(40px + var(--spacing));
   padding-right: 40px;
   margin: 0;
   /*padding-left: var(--spacing);*/
   /*border: 1px solid lightslategrey;*/
   background-color: white;
-  z-index: 0;
+  /*z-index: 0;*/
   outline: none;
   /*will-change: transform;*/
+}
+
+.item.item-list {
+  margin-left: calc(40px + var(--spacing));
+  padding-left: 0;
 }
 
 .item-container {
@@ -86,9 +93,9 @@ h1, h2, h3 {
 }
 
 .item {
-  transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)
-    scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));
-  z-index: 0;
+  /*transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)*/
+  /*  scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));*/
+  /*z-index: 0;*/
 }
 
 .item.dragging {
@@ -98,6 +105,11 @@ h1, h2, h3 {
   --scale-y: 1.04;
 }
 
+body.dragging .item {
+  transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)
+    scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));
+}
+
 .item.dragging:not(.dragOverlay) {
   opacity: 0.3;
   border: 2px dotted #0177ff;
@@ -105,6 +117,7 @@ h1, h2, h3 {
 }
 
 .item.dragOverlay {
+  overflow: hidden;
   cursor: inherit;
   opacity: 0.9;
   background-color: white;
@@ -160,10 +173,16 @@ h1, h2, h3 {
   opacity: 1;
 }
 
+.folding:hover,
+.folding.folded,
+.item-container:hover .folding,
+.item-container.selected .folding {
+  opacity: 1;
+}
+
 .folding {
   position: absolute;
   top: 0;
-  /*left: calc(-6px + var(--spacing));*/
   left: 0;
   width: 40px;
   height: 100%;
@@ -174,8 +193,16 @@ h1, h2, h3 {
   font-size: 18px;
   color: lightslategray;
   padding: 0;
+  opacity: 0;
+  overflow: hidden;
 
   /*background-color: green;*/
+}
+
+.folding-list {
+  /*left: calc(16px + var(--spacing));*/
+  left: -22px;
+  width: 40px;
 }
 
 .folding div {
@@ -294,7 +321,7 @@ h1, h2, h3 {
   width: 20px;
   height: var(--height);
   top: 26px;
-  left: calc(4px + var(--spacing));
+  /*left: calc(39px + var(--spacing));*/
   z-index: 1000;
   cursor: pointer;
 }
