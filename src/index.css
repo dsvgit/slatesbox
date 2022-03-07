@@ -42,6 +42,13 @@ body.grabbing {
   }
 }
 
+h1, h2, h3 {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin: 0;
+  line-height: 32px;
+}
+
 .editable {
   flex: 1;
 }
@@ -50,14 +57,23 @@ body.grabbing {
   margin: 0;
 }
 
-.wrapper {
+.card {
+  border: 1px solid gray;
+  border-radius: 8px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.item {
   position: relative;
   transform-origin: 0 0;
   touch-action: manipulation;
 
   padding: 3px;
-  margin: 5px;
-  padding-left: var(--spacing);
+  padding-left: 40px;
+  padding-right: 40px;
+  margin: 0;
+  /*padding-left: var(--spacing);*/
   /*border: 1px solid lightslategrey;*/
   background-color: white;
   z-index: 0;
@@ -65,26 +81,30 @@ body.grabbing {
   /*will-change: transform;*/
 }
 
-.wrapper {
+.item-container {
+  position: relative;
+}
+
+.item {
   transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)
     scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));
   z-index: 0;
 }
 
-.wrapper.dragging {
+.item.dragging {
   z-index: 1;
   background-color: rgba(255, 255, 255, 0.3);
   --scale-x: 1.04;
   --scale-y: 1.04;
 }
 
-.wrapper.dragging:not(.dragOverlay) {
+.item.dragging:not(.dragOverlay) {
   opacity: 0.3;
   border: 2px dotted #0177ff;
   /*background-color: #08baff;*/
 }
 
-.wrapper.dragOverlay {
+.item.dragOverlay {
   cursor: inherit;
   opacity: 0.9;
   background-color: white;
@@ -105,7 +125,8 @@ body.grabbing {
 
 .handle {
   position: absolute;
-  left: -50px;
+  left: -30px;
+  width: 29px;
   user-select: none;
   background: none;
   border: none;
@@ -119,26 +140,33 @@ body.grabbing {
   /*background-color: blue;*/
 }
 
+.handle:hover {
+  background-color: whitesmoke;
+}
+
 @media only screen and (max-width: 768px) {
   .handle {
     opacity: 1;
   }
 }
 
-.wrapper.dragging .handle,
-.wrapper.dragOverlay .handle {
+.item.dragging .handle,
+.item.dragOverlay .handle {
   cursor: inherit;
 }
 
-.wrapper:hover .handle,
-.wrapper.selected .handle {
+.item-container:hover .handle,
+.item-container.selected .handle {
   opacity: 1;
 }
 
 .folding {
   position: absolute;
-  top: 3px;
-  left: calc(-6px + var(--spacing));
+  top: 0;
+  /*left: calc(-6px + var(--spacing));*/
+  left: 0;
+  width: 40px;
+  height: 100%;
   cursor: pointer;
   user-select: none;
   background: none;
@@ -146,7 +174,6 @@ body.grabbing {
   font-size: 18px;
   color: lightslategray;
   padding: 0;
-
 
   /*background-color: green;*/
 }
@@ -170,7 +197,7 @@ body.grabbing {
   pointer-events: none;
 }
 
-.wrapper.dragging.indicator {
+.item.dragging.indicator {
   opacity: 1;
   position: relative;
   z-index: 1;

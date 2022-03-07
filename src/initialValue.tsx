@@ -387,7 +387,7 @@ const sValue: Descendant[] = [
   },
 ];
 
-const data: Descendant[] = [...listValue];
+const data: Descendant[] = [...initialValue];
 
 data.forEach(assignIdRecursively);
 

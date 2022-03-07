@@ -20,10 +20,10 @@ import { Slate, Editable, withReact } from "slate-react";
 import { createPortal } from "react-dom";
 
 import { renderElementContent } from "hooks/useRenderElement";
-import { Item } from "plugins/wrapper";
 import { DndStateProvider } from "hooks/useDndState";
 import { sortableCollisionDetection } from "slate-extended/dnd/sortableCollisionDetection";
 import { moveDndElements } from "slate-extended/transforms/moveDndElements";
+import { Item } from "plugins/wrapper/components/Item";
 
 const measuring = {
   droppable: {

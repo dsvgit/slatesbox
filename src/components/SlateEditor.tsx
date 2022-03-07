@@ -15,6 +15,7 @@ import withList from "plugins/list/withList";
 import EditorToolbar from "components/EditorToolbar";
 import SlateExtended from "slate-extended/SlateExtended";
 import { compareLevels } from "slate-extended/utils";
+import Card from "components/Card";
 
 const SlateEditor = () => {
   const editorRef = useRef<Editor>();
@@ -30,7 +31,9 @@ const SlateEditor = () => {
   return (
     <Slate editor={editor} value={value} onChange={setValue}>
       <EditorToolbar />
-      <SlateContent />
+      <Card>
+        <SlateContent />
+      </Card>
       {/*<pre style={{ position: "absolute", fontSize: 13, top: 0, right: 100 }}>*/}
       {/*  {JSON.stringify(value, null, 2)}*/}
       {/*</pre>*/}

@@ -20,7 +20,7 @@ const EditorToolbar = () => {
   const editor = useSlateStatic();
 
   return (
-    <div>
+    <div style={{ marginBottom: 18 }}>
       <button
         onClick={() => toggleElement(editor, ParagraphType)}
         className="toolbar-button"
