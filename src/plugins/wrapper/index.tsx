@@ -5,7 +5,6 @@ import { useDndState } from "hooks/useDndState";
 import useWrapperIntersectionObserver from "plugins/wrapper/useWrapperIntersectionObserver";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { foldElement } from "slate-extended/transforms/foldElement";
-import FoldingLine from "plugins/wrapper/components/FoldingLine";
 import { Sortable } from "plugins/wrapper/components/Sortable";
 import { Item, ItemProps } from "plugins/wrapper/components/Item";
 

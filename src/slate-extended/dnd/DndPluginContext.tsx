@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { createEditor, Editor, Transforms, Descendant, Element } from "slate";
 import {
   AutoScrollActivator,
@@ -8,6 +8,7 @@ import {
   MeasuringStrategy,
   MouseSensor,
   TouchSensor,
+  TraversalOrder,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -16,7 +17,7 @@ import {
   SortableContext,
 } from "@dnd-kit/sortable";
 import { DragStartEvent } from "@dnd-kit/core/dist/types";
-import { Slate, Editable, withReact } from "slate-react";
+import { Slate, Editable, withReact, ReactEditor } from "slate-react";
 import { createPortal } from "react-dom";
 
 import { renderElementContent } from "hooks/useRenderElement";
@@ -33,10 +34,14 @@ const measuring = {
 
 type DndPluginContextProps = {
   editor: Editor;
+  onDragStart?(event: DragStartEvent): void;
+  onDragEnd?(event: DragEndEvent): void;
 };
 
 const DndPluginContext = ({
   editor,
+  onDragStart,
+  onDragEnd,
   children,
 }: React.PropsWithChildren<DndPluginContextProps>) => {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -49,9 +54,30 @@ const DndPluginContext = ({
     [editor.children]
   );
 
-  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
+  const clearSelection = () => {
+    ReactEditor.blur(editor);
+    Transforms.deselect(editor);
+    window.getSelection()?.empty();
+  };
+
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 0.5,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    })
+  );
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
+    clearSelection();
+    onDragStart && onDragStart(event);
+
     const { active } = event;
 
     if (!active) {
@@ -59,11 +85,13 @@ const DndPluginContext = ({
     }
 
     document.body.classList.add("dragging");
+
     setActiveId(active.id);
   }, []);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
+      onDragEnd && onDragEnd(event);
       const { active, over } = event;
 
       if (over) {
@@ -71,13 +99,20 @@ const DndPluginContext = ({
         if (active.id !== over.id) {
           const activeElement = editor.children.find(
             (x) => Element.isElement(x) && x.id === active.id
-          )! as Element;
+          ) as Element;
 
           moveDndElements(editor, activeElement, overIndex);
         }
       }
 
+      const selectIndex = editor.children.findIndex(
+        (x) => Element.isElement(x) && x.id === active.id
+      );
+      ReactEditor.focus(editor);
+      Transforms.select(editor, Editor.end(editor, [selectIndex]));
+
       document.body.classList.remove("dragging");
+
       setActiveId(null);
     },
     [editor]
@@ -101,11 +136,13 @@ const DndPluginContext = ({
         measuring={measuring}
         autoScroll={{
           threshold: {
-            x: 0.25,
-            y: 0.25,
+            x: 0.18,
+            y: 0.18,
           },
-          acceleration: 18,
-          activator: AutoScrollActivator.Pointer,
+          interval: 5,
+          acceleration: 30,
+          activator: AutoScrollActivator.DraggableRect,
+          order: TraversalOrder.TreeOrder,
         }}
       >
         <SortableContext strategy={verticalListSortingStrategy} items={items}>
@@ -115,8 +152,8 @@ const DndPluginContext = ({
           <DragOverlay
             adjustScale={false}
             dropAnimation={{
-              duration: 0,
-              easing: "none",
+              duration: 250,
+              easing: "cubic-bezier(.43,.96,.36,1.13)",
               dragSourceOpacity: 0,
             }}
           >

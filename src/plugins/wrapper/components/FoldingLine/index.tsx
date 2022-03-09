@@ -16,7 +16,18 @@ const FoldingLine = (props: Props & { element: Element }) => {
   const { element, onFold } = props;
   const [height, setHeight] = useState(0);
 
+  const hasFoldingLine =
+    isListItemElement(element) &&
+    isFoldingElement(element) &&
+    ExtendedEditor.semanticNode(element).children.length > 0 &&
+    !element.folded;
+
   useEffect(() => {
+    if (!hasFoldingLine) {
+      setHeight(0);
+      return;
+    }
+
     try {
       const semanticDescendants = ExtendedEditor.semanticDescendants(element);
 
@@ -39,14 +50,9 @@ const FoldingLine = (props: Props & { element: Element }) => {
     } catch (error) {
       console.error(error);
     }
-  }, [editor.children]);
+  }, [hasFoldingLine, editor.children]);
 
-  if (
-    isListItemElement(element) &&
-    isFoldingElement(element) &&
-    ExtendedEditor.semanticNode(element).children.length > 0 &&
-    !element.folded
-  ) {
+  if (hasFoldingLine) {
     return (
       <FoldingLineMemoized
         depth={element.depth}

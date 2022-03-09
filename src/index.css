@@ -64,6 +64,9 @@ h3 {
   border-radius: 8px;
   padding-top: 40px;
   padding-bottom: 40px;
+  min-height: 100%;
+  flex: 1;
+  display: flex;
 }
 
 .item {
@@ -165,8 +168,8 @@ body.dragging .item {
   }
 }
 
-.item.dragging .handle,
-.item.dragOverlay .handle {
+.item-container.dragging .handle,
+.item-container.dragOverlay .handle {
   cursor: inherit;
 }
 

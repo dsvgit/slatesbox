@@ -372,11 +372,11 @@ const pValue: Descendant[] = [
   },
   {
     type: "p",
-    children: [{ text: "First item" }],
+    children: [{ text: "Second item" }],
   },
   {
     type: "p",
-    children: [{ text: "First item" }],
+    children: [{ text: "Third item" }],
   },
 ];
 

@@ -20,7 +20,7 @@ const EditorToolbar = () => {
   const editor = useSlateStatic();
 
   return (
-    <div style={{ marginBottom: 18 }}>
+    <div style={{ marginBottom: 18, userSelect: "none" }}>
       <button
         onMouseDown={(e) => {
           e.preventDefault();

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { Fragment, useCallback, useRef, useState } from "react";
 import { createEditor, Descendant, Editor } from "slate";
 import { Slate, Editable, withReact, useSlate } from "slate-react";
 import { withHistory } from "slate-history";
@@ -16,6 +16,7 @@ import EditorToolbar from "components/EditorToolbar";
 import SlateExtended from "slate-extended/SlateExtended";
 import { compareLevels } from "slate-extended/utils";
 import Card from "components/Card";
+import { EditableProps } from "slate-react/dist/components/editable";
 
 const SlateEditor = () => {
   const editorRef = useRef<Editor>();
@@ -24,41 +25,53 @@ const SlateEditor = () => {
       withList(withDivider(withImage(withHistory(withReact(createEditor())))))
     );
   }
-  const editor = editorRef.current;
 
+  const editor = editorRef.current;
   const [value, setValue] = useState<Descendant[]>(initialValue);
+
+  const [, forceRerender] = useState(0);
+
+  const onKeyDown: React.KeyboardEventHandler = useCallback((e) => {
+    listHandlers.onKeyDown(editor)(e);
+    softBreakHandlers.onKeyDown(editor)(e);
+    forceRerender((x) => x + 1); // after dnd ends then ReactEditor.focus call, to continue typing
+  }, []);
 
   return (
     <Slate editor={editor} value={value} onChange={setValue}>
-      <EditorToolbar />
-      <Card>
-        <SlateContent />
-      </Card>
-      {/*<pre style={{ position: "absolute", fontSize: 13, top: 0, right: 100 }}>*/}
-      {/*  {JSON.stringify(value, null, 2)}*/}
-      {/*</pre>*/}
+      <SlateExtended compareLevels={compareLevels}>
+        <DndPluginContext
+          onDragEnd={() => {
+            forceRerender((x) => x + 1); // after dnd ends to provide the right DragOverlay drop animation
+          }}
+          editor={editor}
+        >
+          <EditorToolbar />
+          <Card>
+            <SlateEditable onKeyDown={onKeyDown} />
+          </Card>
+        </DndPluginContext>
+      </SlateExtended>
     </Slate>
   );
 };
 
-const SlateContent = () => {
+const SlateEditable = (props: EditableProps) => {
   const editor = useSlate();
 
   const renderElement = useRenderElement(editor);
 
   return (
-    <SlateExtended compareLevels={compareLevels}>
-      <DndPluginContext editor={editor}>
-        <Editable
-          className="editable"
-          renderElement={renderElement}
-          onKeyDown={useCallback((e) => {
-            listHandlers.onKeyDown(editor)(e);
-            softBreakHandlers.onKeyDown(editor)(e);
-          }, [])}
-        />
-      </DndPluginContext>
-    </SlateExtended>
+    <Fragment>
+      <Editable
+        className="editable"
+        renderElement={renderElement}
+        onKeyDown={props.onKeyDown}
+      />
+      {/*<pre style={{ position: "absolute", fontSize: 13, top: 0, right: 100 }}>*/}
+      {/*  {JSON.stringify(editor?.selection, null, 2)}*/}
+      {/*</pre>*/}
+    </Fragment>
   );
 };
 
