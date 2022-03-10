@@ -9,7 +9,7 @@ import { isListItemElement } from "plugins/list/utils";
 export const withExtended = <T extends Editor>(editor: T) => {
   const e = editor as T & ExtendedEditor;
 
-  const { insertBreak, deleteBackward, apply } = e;
+  const { insertBreak, deleteBackward } = e;
 
   e.deleteBackward = (unit) => {
     if (editor.selection) {

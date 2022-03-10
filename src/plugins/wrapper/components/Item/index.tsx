@@ -22,6 +22,7 @@ export type ItemProps = {
   isInViewport?: boolean;
   hidden?: boolean;
   attributes?: SortableAttributes;
+  dragDepth?: number;
 
   // sortable props
   transition?: string | null;
@@ -44,6 +45,7 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
     isDragOverlay = false,
     isInViewport = false,
     hidden = false,
+    dragDepth = 0,
     attributes,
   } = props;
 
@@ -65,9 +67,6 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
         style={
           {
             transition,
-            "--spacing": isListItemElement(element)
-              ? `${38 * element.depth}px`
-              : "0px",
             "--translate-x": transform
               ? `${Math.round(transform.x)}px`
               : undefined,

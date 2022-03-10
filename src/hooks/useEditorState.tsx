@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-import {SemanticNode} from "slate-extended/types";
+import { SemanticNode } from "slate-extended/types";
 
 type EditorStateValue = {
   semanticTree: SemanticNode[];
@@ -9,12 +9,9 @@ type EditorStateValue = {
   droppableEnds: Set<number>;
 };
 
-const EditorStateContext = createContext<EditorStateValue>({
-  semanticTree: [],
-  droppableIntervals: [],
-  droppableStarts: new Set(),
-  droppableEnds: new Set(),
-});
+const EditorStateContext = createContext<EditorStateValue>(
+  {} as EditorStateValue
+);
 
 export const useEditorState = () => {
   return useContext(EditorStateContext);

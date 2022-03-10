@@ -4,6 +4,7 @@ import {
   AutoScrollActivator,
   DndContext,
   DragEndEvent,
+  DragMoveEvent,
   DragOverlay,
   MeasuringStrategy,
   MouseSensor,
@@ -23,8 +24,12 @@ import { createPortal } from "react-dom";
 import { renderElementContent } from "hooks/useRenderElement";
 import { DndStateProvider } from "hooks/useDndState";
 import { sortableCollisionDetection } from "slate-extended/dnd/sortableCollisionDetection";
-import { moveDndElements } from "slate-extended/transforms/moveDndElements";
+import {
+  moveDndDepth,
+  moveDndElements,
+} from "slate-extended/transforms/moveDndElements";
 import { Item } from "plugins/wrapper/components/Item";
+import { isListItemElement } from "plugins/list/utils";
 
 const measuring = {
   droppable: {
@@ -45,6 +50,15 @@ const DndPluginContext = ({
   children,
 }: React.PropsWithChildren<DndPluginContextProps>) => {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [offsetLeft, setOffsetLeft] = useState<number>(0);
+
+  const activeElement = editor.children.find(
+    (x) => Element.isElement(x) && x.id === activeId
+  );
+  const diffDepth = Math.round(offsetLeft / 50);
+  const dragDepth = isListItemElement(activeElement)
+    ? activeElement.depth + diffDepth
+    : 0;
 
   const items = useMemo(
     () =>
@@ -89,6 +103,10 @@ const DndPluginContext = ({
     setActiveId(active.id);
   }, []);
 
+  const handleDragMove = ({ delta }: DragMoveEvent) => {
+    setOffsetLeft(delta.x);
+  };
+
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       onDragEnd && onDragEnd(event);
@@ -96,12 +114,19 @@ const DndPluginContext = ({
 
       if (over) {
         let overIndex = over.data.current?.sortable.index;
-        if (active.id !== over.id) {
-          const activeElement = editor.children.find(
-            (x) => Element.isElement(x) && x.id === active.id
-          ) as Element;
+        const activeElement = editor.children.find(
+          (x) => Element.isElement(x) && x.id === active.id
+        ) as Element;
 
-          moveDndElements(editor, activeElement, overIndex);
+        if (active.id !== over.id) {
+          moveDndElements(editor, active.id, overIndex);
+        }
+
+        if (
+          isListItemElement(activeElement) &&
+          activeElement.depth !== dragDepth
+        ) {
+          moveDndDepth(editor, active.id, dragDepth);
         }
       }
 
@@ -111,27 +136,38 @@ const DndPluginContext = ({
       ReactEditor.focus(editor);
       Transforms.select(editor, Editor.end(editor, [selectIndex]));
 
-      document.body.classList.remove("dragging");
-
-      setActiveId(null);
+      resetState();
     },
-    [editor]
+    [editor, dragDepth]
   );
+
+  const handleDragCancel = () => {
+    resetState();
+  };
+
+  const resetState = () => {
+    setActiveId(null);
+    setOffsetLeft(0);
+
+    document.body.classList.remove("dragging");
+  };
 
   return (
     <DndStateProvider
       value={useMemo(
         () => ({
           activeId,
+          dragDepth,
         }),
-        [activeId]
+        [activeId, dragDepth]
       )}
     >
       <DndContext
         collisionDetection={sortableCollisionDetection}
         onDragStart={handleDragStart}
+        onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
-        onDragCancel={() => setActiveId(null)}
+        onDragCancel={handleDragCancel}
         sensors={sensors}
         measuring={measuring}
         autoScroll={{
@@ -152,7 +188,7 @@ const DndPluginContext = ({
           <DragOverlay
             adjustScale={false}
             dropAnimation={{
-              duration: 250,
+              duration: 220,
               easing: "cubic-bezier(.43,.96,.36,1.13)",
               dragSourceOpacity: 0,
             }}
