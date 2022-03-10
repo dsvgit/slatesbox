@@ -8,8 +8,7 @@ export const moveDndElements = (
   element: Element,
   overIndex: number
 ) => {
-  // const foldedCount = isFoldingElement(element) ? element.foldedCount : 0;
-  const foldedCount = 0;
+  const foldedCount = isFoldingElement(element) ? element.foldedCount : 0;
 
   const semanticDescendants =
     ExtendedEditor.semanticDescendants(element)?.slice(0, foldedCount) || [];

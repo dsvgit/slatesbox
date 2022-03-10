@@ -306,6 +306,7 @@ const listValue: Descendant[] = [
     listType: ListTypes.Bulleted,
     depth: 1,
     folded: true,
+    foldedCount: 3,
     children: [{ text: "Wash car" }],
   },
   {

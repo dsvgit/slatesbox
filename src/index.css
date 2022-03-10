@@ -207,7 +207,7 @@ body.dragging .item {
 .folding-list {
   /*left: calc(16px + var(--spacing));*/
   left: -22px;
-  width: 40px;
+  width: 19px;
 }
 
 .folding div {
@@ -334,7 +334,7 @@ body.dragging .item {
 .list-line::before {
   width: 2px;
   height: 100%;
-  background-color: gray;
+  background-color: lightgrey;
   display: block;
   content: "";
   margin-left: 10px;

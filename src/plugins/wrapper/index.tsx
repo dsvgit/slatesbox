@@ -18,7 +18,7 @@ const Wrapper = (
   const id = element.id!;
   const selected = useSelected();
 
-  const hidden = ExtendedEditor.isFoldedChild(element);
+  const hidden = ExtendedEditor.semanticNode(element).hidden;
 
   const isInViewport = useWrapperIntersectionObserver(
     attributes.ref,

@@ -19,8 +19,7 @@ const FoldingLine = (props: Props & { element: Element }) => {
   const hasFoldingLine =
     isListItemElement(element) &&
     isFoldingElement(element) &&
-    ExtendedEditor.semanticNode(element).children.length > 0 &&
-    !element.folded;
+    ExtendedEditor.semanticNode(element).children.length > 0;
 
   useEffect(() => {
     if (!hasFoldingLine) {

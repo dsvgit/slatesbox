@@ -1,8 +1,8 @@
-import {BaseEditor, Descendant, Element} from "slate";
+import { BaseEditor, Descendant, Element } from "slate";
 
-import {SemanticNode} from "slate-extended/types";
-import {ELEMENT_TO_SEMANTIC_PATH} from "slate-extended/weakMaps";
-import {crawlChildren, isFoldingElement} from "slate-extended/utils";
+import { SemanticNode } from "slate-extended/types";
+import { ELEMENT_TO_SEMANTIC_PATH } from "slate-extended/weakMaps";
+import { crawlChildren, isFoldingElement } from "slate-extended/utils";
 
 export interface ExtendedEditor extends BaseEditor {
   compareLevels: (a: Element, b: Element) => number;
@@ -34,7 +34,20 @@ export const ExtendedEditor = {
       if (edgeIndex !== -1) {
         path.splice(edgeIndex);
       }
-      path.push({ element, children: [], index });
+
+      // calculate hidden
+      let hidden = false;
+      const folded = [...path]
+        .reverse()
+        .find((node) => isFoldingElement(node.element) && node.element.folded);
+      if (folded) {
+        const foldedCount = isFoldingElement(folded.element)
+          ? folded.element.foldedCount ?? 0
+          : 0;
+        hidden = foldedCount >= index - folded.index;
+      }
+
+      path.push({ element, children: [], index, hidden, folded });
 
       setPath && setPath(element, [...path]);
 
@@ -80,18 +93,4 @@ export const ExtendedEditor = {
 
     return result;
   },
-
-  isFoldedChild(element: Element): boolean {
-    const path = ExtendedEditor.semanticPath(element);
-
-    const result = path.some(
-      (node) =>
-        isFoldingElement(node.element) &&
-        node.element !== element &&
-        node.element.folded
-    );
-
-    return result;
-  },
 };
-

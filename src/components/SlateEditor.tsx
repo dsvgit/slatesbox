@@ -17,12 +17,17 @@ import SlateExtended from "slate-extended/SlateExtended";
 import { compareLevels } from "slate-extended/utils";
 import Card from "components/Card";
 import { EditableProps } from "slate-react/dist/components/editable";
+import { withExtended } from "slate-extended/withExtended";
 
 const SlateEditor = () => {
   const editorRef = useRef<Editor>();
   if (!editorRef.current) {
     editorRef.current = withNodeId(
-      withList(withDivider(withImage(withHistory(withReact(createEditor())))))
+      withList(
+        withDivider(
+          withImage(withExtended(withHistory(withReact(createEditor()))))
+        )
+      )
     );
   }
 

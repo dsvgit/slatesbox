@@ -44,7 +44,10 @@ const FoldingArrowMemoized = memo(
       <button
         contentEditable={false}
         className={cn("folding", { "folding-list": isList, folded: folded })}
-        onMouseDown={onFold}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          onFold && onFold(e);
+        }}
       >
         <div
           style={
