@@ -18,16 +18,27 @@ import { compareLevels } from "slate-extended/utils";
 import Card from "components/Card";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { withExtended } from "slate-extended/withExtended";
+import { composePlugins } from "utils";
+import { withAutoformat } from "plugins/autoformat/withAutoformat";
+import { autoformatRules } from "plugins/autoformat/autoformatRules";
+import { withResetType } from "plugins/resetType/withResetType";
 
 const SlateEditor = () => {
   const editorRef = useRef<Editor>();
   if (!editorRef.current) {
-    editorRef.current = withNodeId(
-      withList(
-        withDivider(
-          withImage(withExtended(withHistory(withReact(createEditor()))))
-        )
-      )
+    editorRef.current = composePlugins(
+      [
+        withResetType,
+        withAutoformat(autoformatRules),
+        withList,
+        withDivider,
+        withImage,
+        withExtended,
+        withNodeId,
+        withHistory,
+        withReact,
+      ],
+      createEditor()
     );
   }
 
