@@ -62,7 +62,6 @@ export const moveDndDepth = (
 
       for (let [node] of entries) {
         if (isListItemElement(node)) {
-          console.log(node.depth, depthDiff);
           Transforms.setNodes(
             editor,
             {
