@@ -160,8 +160,8 @@ body.dragging .item {
 }
 
 .item-container-list .handle {
-  left: -20px;
-  width: 20px;
+  left: calc(-70px - var(--spacing));
+  width: 29px;
 }
 
 .item-container-list .folding {

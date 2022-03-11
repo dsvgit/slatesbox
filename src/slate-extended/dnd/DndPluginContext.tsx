@@ -209,22 +209,9 @@ const DndPluginContext = ({
               dragSourceOpacity: 0,
             }}
           >
-            {activeId ? (
-              <Item
-                element={
-                  editor.children.find(
-                    (x) => Element.isElement(x) && x.id === activeId
-                  )! as Element
-                }
-                isDragOverlay={true}
-              >
-                <DragOverlayContent
-                  element={
-                    editor.children.find(
-                      (x) => Element.isElement(x) && x.id === activeId
-                    )!
-                  }
-                />
+            {activeId && Element.isElement(activeElement) ? (
+              <Item element={activeElement} isDragOverlay={true}>
+                <DragOverlayContent element={activeElement} />
               </Item>
             ) : null}
           </DragOverlay>,
