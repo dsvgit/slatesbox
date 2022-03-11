@@ -58,7 +58,7 @@ const DndPluginContext = ({
   );
   const diffDepth = Math.round(offsetLeft / 50);
   const dragDepth = isListItemElement(activeElement)
-    ? activeElement.depth + diffDepth
+    ? Math.max(0, activeElement.depth + diffDepth)
     : 0;
 
   const items = useMemo(
