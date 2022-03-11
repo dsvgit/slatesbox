@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/slatesbox/static/css/main.837789fd.css",
-    "main.js": "/slatesbox/static/js/main.377886bc.js",
+    "main.js": "/slatesbox/static/js/main.08e2b525.js",
     "index.html": "/slatesbox/index.html",
     "main.837789fd.css.map": "/slatesbox/static/css/main.837789fd.css.map",
-    "main.377886bc.js.map": "/slatesbox/static/js/main.377886bc.js.map"
+    "main.08e2b525.js.map": "/slatesbox/static/js/main.08e2b525.js.map"
   },
   "entrypoints": [
     "static/css/main.837789fd.css",
-    "static/js/main.377886bc.js"
+    "static/js/main.08e2b525.js"
   ]
 }
