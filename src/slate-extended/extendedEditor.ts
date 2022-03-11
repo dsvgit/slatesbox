@@ -53,7 +53,7 @@ export const ExtendedEditor = {
         index,
         hidden,
         folded,
-        descendantsCount: 0,
+        descendants: [],
       });
 
       setPath && setPath(element, [...path]);
@@ -62,7 +62,9 @@ export const ExtendedEditor = {
       const parent = path[path.length - 2];
       const children = parent ? parent.children : tree;
       if (parent) {
-        path.slice(0, -1).forEach((x) => x.descendantsCount++);
+        path.slice(0, -1).forEach((x) => {
+          x.descendants.push(last);
+        });
       }
 
       children.push(last);
@@ -83,9 +85,9 @@ export const ExtendedEditor = {
 
     crawlChildren(
       semanticChildren,
-      ({ element, children, index, descendantsCount }, context) => {
+      ({ element, children, index, descendants }, context) => {
         if (skipCount > 0) {
-          skipCount = skipCount - descendantsCount - 1;
+          skipCount = skipCount - descendants.length - 1;
           context.skip();
           return;
         }
@@ -130,13 +132,6 @@ export const ExtendedEditor = {
 
   semanticDescendants(element: Element): SemanticNode[] {
     const semanticNode = ExtendedEditor.semanticNode(element);
-
-    const result: SemanticNode[] = [];
-
-    crawlChildren(semanticNode.children, (node) => {
-      result.push(node);
-    });
-
-    return result;
+    return semanticNode.descendants;
   },
 };

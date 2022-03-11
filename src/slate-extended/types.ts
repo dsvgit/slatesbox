@@ -19,5 +19,5 @@ export type SemanticNode<T extends Element = Element> = {
   index: number;
   hidden: boolean;
   folded: SemanticNode | undefined;
-  descendantsCount: number;
+  descendants: SemanticNode[];
 };
