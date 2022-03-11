@@ -30,6 +30,7 @@ import {
 } from "slate-extended/transforms/moveDndElements";
 import { Item } from "plugins/wrapper/components/Item";
 import { isListItemElement } from "plugins/list/utils";
+import { ExtendedEditor } from "slate-extended/extendedEditor";
 
 const measuring = {
   droppable: {
@@ -113,19 +114,34 @@ const DndPluginContext = ({
       const { active, over } = event;
 
       if (over) {
+        const activeIndex = active.data.current?.sortable.index;
         let overIndex = over.data.current?.sortable.index;
-        const activeElement = editor.children.find(
+
+        const element = editor.children.find(
           (x) => Element.isElement(x) && x.id === active.id
         ) as Element;
+
+        if (activeIndex < overIndex) {
+          const droppableIntervals = ExtendedEditor.getDroppableIntervals(
+            editor.semanticChildren,
+            editor.children.length
+          );
+          const droppableEnds = new Set(droppableIntervals.map((x) => x[1]));
+
+          // adjust over index in case it is outside droppable elements
+          for (const end of droppableEnds) {
+            if (overIndex <= end) {
+              overIndex = end;
+              break;
+            }
+          }
+        }
 
         if (active.id !== over.id) {
           moveDndElements(editor, active.id, overIndex);
         }
 
-        if (
-          isListItemElement(activeElement) &&
-          activeElement.depth !== dragDepth
-        ) {
+        if (isListItemElement(element) && element.depth !== dragDepth) {
           moveDndDepth(editor, active.id, dragDepth);
         }
       }

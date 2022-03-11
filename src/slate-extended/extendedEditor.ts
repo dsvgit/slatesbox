@@ -47,13 +47,23 @@ export const ExtendedEditor = {
         hidden = foldedCount >= index - folded.index;
       }
 
-      path.push({ element, children: [], index, hidden, folded });
+      path.push({
+        element,
+        children: [],
+        index,
+        hidden,
+        folded,
+        descendantsCount: 0,
+      });
 
       setPath && setPath(element, [...path]);
 
       const last = path[path.length - 1];
       const parent = path[path.length - 2];
       const children = parent ? parent.children : tree;
+      if (parent) {
+        path.slice(0, -1).forEach((x) => x.descendantsCount++);
+      }
 
       children.push(last);
 
@@ -61,6 +71,42 @@ export const ExtendedEditor = {
     }
 
     return tree;
+  },
+
+  getDroppableIntervals(
+    semanticChildren: SemanticNode[],
+    contentLength: number
+  ): [number, number][] {
+    const intervals: [number, number][] = [];
+    let lastIndex = 0;
+    let skipCount = 0;
+
+    crawlChildren(
+      semanticChildren,
+      ({ element, children, index, descendantsCount }, context) => {
+        if (skipCount > 0) {
+          skipCount = skipCount - descendantsCount - 1;
+          context.skip();
+          return;
+        }
+
+        if (isFoldingElement(element) && element.folded && children.length) {
+          skipCount = element.foldedCount || 0;
+        }
+
+        if (index > 0) {
+          // finish previous interval
+          intervals.push([lastIndex, index - 1]);
+        }
+
+        lastIndex = index;
+      }
+    );
+
+    // finish last interval
+    intervals.push([lastIndex, Math.max(contentLength - 1, 0)]);
+
+    return intervals;
   },
 
   semanticPath(element: Element): SemanticNode[] {

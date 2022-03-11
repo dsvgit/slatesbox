@@ -2,7 +2,6 @@ import { Node, Editor, Element, Transforms } from "slate";
 
 import { isFoldingElement } from "slate-extended/utils";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
-import { isListItemElement } from "plugins/list/utils";
 
 export const moveDndElements = (
   editor: Editor,
