@@ -17,6 +17,7 @@ export type SemanticNode<T extends Element = Element> = {
   element: T;
   children: SemanticNode[];
   index: number;
+  listIndex: number;
   hidden: boolean;
   folded: SemanticNode | undefined;
   descendants: SemanticNode[];

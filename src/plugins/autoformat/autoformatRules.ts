@@ -1,4 +1,5 @@
 import { AutoformatRule } from "@udecode/plate-autoformat";
+
 import {
   Heading1Type,
   Heading2Type,

@@ -3,6 +3,7 @@ import { BaseEditor, Descendant, Element } from "slate";
 import { SemanticNode } from "slate-extended/types";
 import { ELEMENT_TO_SEMANTIC_PATH } from "slate-extended/weakMaps";
 import { crawlChildren, isFoldingElement } from "slate-extended/utils";
+import { isListItemElement } from "plugins/list/utils";
 
 export interface ExtendedEditor extends BaseEditor {
   compareLevels: (a: Element, b: Element) => number;
@@ -22,6 +23,8 @@ export const ExtendedEditor = {
     const path: SemanticNode[] = [];
     let index = 0;
 
+    let depthCounters: Record<string, number> = {}; // depth-counters map
+
     for (const element of children) {
       if (!Element.isElement(element)) {
         continue;
@@ -32,7 +35,30 @@ export const ExtendedEditor = {
       );
 
       if (edgeIndex !== -1) {
+        // keep only current element parents
         path.splice(edgeIndex);
+      }
+
+      // calculate list index
+      let listIndex = 0;
+      if (isListItemElement(element)) {
+        // init counter
+        if (depthCounters[element.depth] == null) {
+          depthCounters[element.depth] = 0;
+        }
+
+        // reset all counters with larger depth
+        for (const key of Object.keys(depthCounters)) {
+          if (Number(key) > element.depth) {
+            depthCounters[key] = 0;
+          }
+        }
+
+        listIndex = depthCounters[element.depth];
+        depthCounters[element.depth]++;
+      } else {
+        // reset depth counters because current list ends
+        depthCounters = {}; // depth-counters map
       }
 
       // calculate hidden
@@ -47,10 +73,12 @@ export const ExtendedEditor = {
         hidden = foldedCount >= index - folded.index;
       }
 
+      // add current element to path
       path.push({
         element,
         children: [],
         index,
+        listIndex,
         hidden,
         folded,
         descendants: [],
@@ -133,5 +161,10 @@ export const ExtendedEditor = {
   semanticDescendants(element: Element): SemanticNode[] {
     const semanticNode = ExtendedEditor.semanticNode(element);
     return semanticNode.descendants;
+  },
+
+  semanticParent(element: Element): SemanticNode | null {
+    const path = ExtendedEditor.semanticPath(element);
+    return path.length > 1 ? path[path.length - 2] : null;
   },
 };

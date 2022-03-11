@@ -1,29 +1,11 @@
-import { ListTypes } from "./types";
-
-export const getPointerContent = ({
-  depth,
-  index,
-  listType,
-}: {
-  depth: number;
-  index: number;
-  listType: ListTypes;
-}) => {
-  switch (listType) {
-    case ListTypes.Bulleted:
-      return getBulletedPointer(depth);
-      break;
-    case ListTypes.Numbered:
-      return getNumberedPointer(depth, index).toLowerCase();
-      break;
-    default:
-      return "";
-  }
-};
-
-const getBulletedPointer = (depth: any) => {
+export const getBulletedPointerContent = (depth: number) => {
   const pointers = ["●", "○", "■"];
   return pointers[depth % pointers.length];
+};
+
+export const getNumberedPointerContent = (depth: number, index: number) => {
+  const converters = [String, intToLatin, intToRoman];
+  return converters[depth % converters.length](index + 1).toLowerCase();
 };
 
 const intToLatin = (_num: any) => {
@@ -72,9 +54,4 @@ const intToRoman = (num: number) => {
   }
 
   return result;
-};
-
-const getNumberedPointer = (depth: any, index: any) => {
-  const converters = [String, intToLatin, intToRoman];
-  return converters[depth % converters.length](index + 1);
 };

@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import cn from "classnames";
+import { useSlate, useSlateStatic } from "slate-react";
 
 import { ElementProps } from "plugins/types";
 import { ListItemElement, ListTypes } from "plugins/list/types";
-import { getPointerContent } from "plugins/list/getPointerContent";
-import { useSlateStatic } from "slate-react";
+import {
+  getBulletedPointerContent,
+  getNumberedPointerContent,
+} from "plugins/list/getPointerContent";
 import { isTodoListItemElement } from "plugins/list/utils";
 import { checkTodoItem } from "plugins/list/transforms";
 import { foldElement } from "slate-extended/transforms/foldElement";
+import { ExtendedEditor } from "slate-extended/extendedEditor";
 
 const ListItem = (props: ElementProps & { element: ListItemElement }) => {
   const editor = useSlateStatic();
@@ -16,29 +20,22 @@ const ListItem = (props: ElementProps & { element: ListItemElement }) => {
   const { depth, listType } = element;
 
   return (
-    <li
-      {...attributes}
-      className={cn("list-item", `list-item-${listType}`)}
-      style={
-        {
-          "--pointer-content": `"${getPointerContent({
-            depth,
-            index: 0,
-            listType,
-          })}"`,
-        } as React.CSSProperties
-      }
-    >
-      {(listType === ListTypes.Bulleted || listType === ListTypes.Numbered) && (
+    <li {...attributes} className={cn("list-item", `list-item-${listType}`)}>
+      {listType === ListTypes.Bulleted && (
         <button
           contentEditable={false}
           className="pointer"
+          style={
+            {
+              "--pointer-content": `"${getBulletedPointerContent(depth)}"`,
+            } as React.CSSProperties
+          }
           onMouseDown={() => {
-            // TODO: check if it has semantic children
             foldElement(editor, element);
           }}
         />
       )}
+      {listType === ListTypes.Numbered && <NumberedPointer element={element} />}
       {isTodoListItemElement(element) && (
         <div contentEditable={false} className="pointer">
           <input
@@ -51,6 +48,34 @@ const ListItem = (props: ElementProps & { element: ListItemElement }) => {
       )}
       <div>{children}</div>
     </li>
+  );
+};
+
+const NumberedPointer = (props: { element: ListItemElement }) => {
+  const editor = useSlate(); // useSlate to rerender pointer content (index) when this element isn't changed directly
+
+  const { element } = props;
+  const { depth } = element;
+
+  const semanticNode = ExtendedEditor.semanticNode(element);
+  const { listIndex } = semanticNode;
+
+  return (
+    <button
+      contentEditable={false}
+      className="pointer"
+      style={
+        {
+          "--pointer-content": `"${getNumberedPointerContent(
+            depth,
+            listIndex
+          )}"`,
+        } as React.CSSProperties
+      }
+      onMouseDown={() => {
+        foldElement(editor, element);
+      }}
+    />
   );
 };
 
