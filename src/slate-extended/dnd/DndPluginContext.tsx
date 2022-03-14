@@ -188,12 +188,12 @@ const DndPluginContext = ({
         measuring={measuring}
         autoScroll={{
           threshold: {
-            x: 0.18,
-            y: 0.18,
+            x: 0.22,
+            y: 0.22,
           },
           interval: 5,
           acceleration: 30,
-          activator: AutoScrollActivator.DraggableRect,
+          activator: AutoScrollActivator.Pointer,
           order: TraversalOrder.TreeOrder,
         }}
       >

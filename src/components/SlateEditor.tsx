@@ -11,6 +11,7 @@ import { withDivider } from "plugins/divider/withDivider";
 import { withNodeId } from "plugins/nodeId/withNodeId";
 import * as listHandlers from "plugins/list/handlers";
 import * as softBreakHandlers from "plugins/softBreak/handlers";
+import * as markHandlers from "plugins/marks/handlers";
 import withList from "plugins/list/withList";
 import EditorToolbar from "components/EditorToolbar";
 import SlateExtended from "slate-extended/SlateExtended";
@@ -22,6 +23,8 @@ import { composePlugins } from "utils";
 import { withAutoformat } from "plugins/autoformat/withAutoformat";
 import { autoformatRules } from "plugins/autoformat/autoformatRules";
 import { withResetType } from "plugins/resetType/withResetType";
+import { withDeserialize } from "plugins/serialization/withDeserialize";
+import { renderLeaf } from "plugins/marks/renderLeaf";
 
 const SlateEditor = () => {
   const editorRef = useRef<Editor>();
@@ -37,6 +40,7 @@ const SlateEditor = () => {
         withNodeId,
         withHistory,
         withReact,
+        withDeserialize,
       ],
       createEditor()
     );
@@ -50,6 +54,8 @@ const SlateEditor = () => {
   const onKeyDown: React.KeyboardEventHandler = useCallback((e) => {
     listHandlers.onKeyDown(editor)(e);
     softBreakHandlers.onKeyDown(editor)(e);
+    markHandlers.onKeyDown(editor)(e);
+
     forceRerender((x) => x + 1); // after dnd ends then ReactEditor.focus call, to continue typing
   }, []);
 
@@ -82,6 +88,7 @@ const SlateEditable = (props: EditableProps) => {
       <Editable
         className="editable"
         renderElement={renderElement}
+        renderLeaf={renderLeaf}
         onKeyDown={props.onKeyDown}
       />
       {/*<pre style={{ position: "absolute", fontSize: 13, top: 0, right: 100 }}>*/}

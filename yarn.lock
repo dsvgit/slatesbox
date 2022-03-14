@@ -2004,7 +2004,7 @@
     "@typescript-eslint/types" "5.10.1"
     eslint-visitor-keys "^3.0.0"
 
-"@udecode/plate-autoformat@^10.2.2":
+"@udecode/plate-autoformat@10.2.2":
   version "10.2.2"
   resolved "https://registry.yarnpkg.com/@udecode/plate-autoformat/-/plate-autoformat-10.2.2.tgz#aa6f75ab303f59e6c5ac9159184702e24073c836"
   integrity sha512-72vXfewNUPVzwRb+bhVaJsAxwKIc7dn2UbiloEbRgwH+QY+MHjCcZzWfoYVvsN2Tc4ioTHSBl7ueSlBarR4KUQ==

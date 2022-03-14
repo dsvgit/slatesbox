@@ -53,6 +53,7 @@ h3 {
 
 .editable {
   flex: 1;
+  word-break: break-word;
 }
 
 .editable p {

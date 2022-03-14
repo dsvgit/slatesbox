@@ -13,6 +13,7 @@ import { DividerElement } from "plugins/divider/types";
 import { ListItemElement } from "plugins/list/types";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { HashedElement, IdentityElement } from "slate-extended/types";
+import { FormattedText } from "plugins/marks/types";
 
 export type CustomEditor = BaseEditor &
   ReactEditor &
@@ -27,8 +28,6 @@ export type CustomElement =
   | ImageElement
   | DividerElement
   | ListItemElement;
-
-export type FormattedText = { text: string; bold?: true };
 
 export type CustomText = FormattedText;
 
