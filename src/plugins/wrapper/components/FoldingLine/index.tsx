@@ -69,7 +69,7 @@ const FoldingLineMemoized = memo(
     return (
       <div
         contentEditable={false}
-        className="list-line"
+        className="list-line clipboardSkip"
         onClick={onFold}
         style={
           {

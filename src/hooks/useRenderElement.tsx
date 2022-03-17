@@ -22,6 +22,10 @@ import { isDividerElement } from "plugins/divider/utils";
 import Divider from "plugins/divider/components/Divider";
 import { isListItemElement } from "plugins/list/utils";
 import ListItem from "plugins/list/components/ListItem";
+import { isLinkElement } from "plugins/link/utils";
+import Link from "plugins/link/components/Link";
+import { isBlockquoteElement } from "plugins/blockquote/utils";
+import Blockquote from "plugins/blockquote/components/Blockquote";
 
 const useRenderElement = (editor: Editor) => {
   const renderElement = useCallback(
@@ -70,6 +74,14 @@ export const renderElementContent = (props: ElementProps) => {
 
   if (isImageElement(props.element)) {
     return <Image {...props} element={props.element} />;
+  }
+
+  if (isLinkElement(props.element)) {
+    return <Link {...props} element={props.element} />;
+  }
+
+  if (isBlockquoteElement(props.element)) {
+    return <Blockquote {...props} element={props.element} />;
   }
 
   if (isListItemElement(props.element)) {

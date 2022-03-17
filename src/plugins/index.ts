@@ -1,3 +1,2 @@
-export type SlatePlugin = {
-
-}
+export type SlatePlugin = {};
+export { isMatchType } from "plugins/serialization/utils";

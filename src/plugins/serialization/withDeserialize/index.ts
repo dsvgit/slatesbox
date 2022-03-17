@@ -1,8 +1,9 @@
 import { Editor } from "slate";
-import { indexBy } from "ramda";
 import { deserializeHtml, parseHtmlDocument } from "@udecode/plate-core";
 
-import { plugins } from "./deserializePlugins";
+import { deserializePlugins } from "plugins/serialization/withDeserialize/deserializePlugins";
+import { indexBy } from "ramda";
+import { patchPastedClipboardHtml } from "plugins/serialization/withDeserialize/patchPastedClipboardHtml";
 
 export const withDeserialize = (editor: Editor) => {
   const { insertFragmentData } = editor;
@@ -20,24 +21,22 @@ export const withDeserialize = (editor: Editor) => {
       return false;
     }
 
-    const document = parseHtmlDocument(html);
+    const document = new DOMParser().parseFromString(html, "text/html");
 
-    console.log(document);
+    patchPastedClipboardHtml(document.body);
 
     const htmlFragment = deserializeHtml(
       {
         ...editor,
-        plugins,
-        pluginsByKey: indexBy((x) => x.key, plugins),
+        plugins: deserializePlugins,
+        pluginsByKey: indexBy((x) => x.key, deserializePlugins),
       },
-      {
-        element: document.body,
-        stripWhitespace: false,
-      }
+      { element: document.body }
     );
 
     if (htmlFragment) {
-      console.log(htmlFragment);
+      // @ts-ignore
+      window.lastFragment = htmlFragment;
       editor.insertFragment(htmlFragment);
       return true;
     }

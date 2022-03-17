@@ -91,6 +91,7 @@ h3 {
 
 .item-container {
   position: relative;
+  list-style: none;
 }
 
 .item-container-list {

@@ -9,7 +9,12 @@ import { nanoid } from "nanoid";
 import { PlatePlugin } from "@udecode/plate-core/dist/types/plugins/PlatePlugin";
 import { ImageType } from "plugins/image/types";
 import { DeserializeHtml } from "@udecode/plate-core/dist/types/plugins/DeserializeHtml";
+
 import { DividerType } from "plugins/divider/types";
+import { ListItemType } from "plugins/list/types";
+import { BlockquoteType } from "plugins/blockquote/types";
+import { getListItemProps } from "plugins/serialization/utils";
+import { LinkType } from "plugins/link/types";
 
 const rules: DeserializeHtml[] = [
   {
@@ -58,11 +63,46 @@ const rules: DeserializeHtml[] = [
     ],
   },
   {
+    getNode: (el) => ({ type: LinkType, url: el.getAttribute("href") }),
+    isElement: true,
+    rules: [
+      {
+        validNodeName: "A",
+      },
+    ],
+  },
+  {
     getNode: () => ({ type: DividerType }),
     isElement: true,
     rules: [
       {
         validNodeName: "HR",
+      },
+    ],
+  },
+  {
+    getNode: () => ({ type: BlockquoteType }),
+    isElement: true,
+    rules: [
+      {
+        validNodeName: "BLOCKQUOTE",
+      },
+    ],
+  },
+  {
+    getNode: (el) => {
+      const { listType, depth } = getListItemProps(el);
+
+      return {
+        type: ListItemType,
+        depth,
+        listType,
+      };
+    },
+    isElement: true,
+    rules: [
+      {
+        validNodeName: ["LI"],
       },
     ],
   },
@@ -120,13 +160,13 @@ const rules: DeserializeHtml[] = [
   },
 ];
 
-export const plugins: PlatePlugin<any, any>[] = rules.map((rule) =>
+export const deserializePlugins: PlatePlugin<any, any>[] = rules.map((rule) =>
   createPluginFactory<any>({
     key: nanoid(4),
     deserializeHtml: rule,
   })()
 );
 
-plugins.forEach((p) => {
+deserializePlugins.forEach((p) => {
   p.inject = {};
 });

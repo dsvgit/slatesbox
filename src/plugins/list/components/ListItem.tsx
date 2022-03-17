@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import cn from "classnames";
 import { useSlate, useSlateStatic } from "slate-react";
 
@@ -20,11 +20,11 @@ const ListItem = (props: ElementProps & { element: ListItemElement }) => {
   const { depth, listType } = element;
 
   return (
-    <li {...attributes} className={cn("list-item", `list-item-${listType}`)}>
+    <div {...attributes} className={cn("list-item", `list-item-${listType}`)}>
       {listType === ListTypes.Bulleted && (
         <button
           contentEditable={false}
-          className="pointer"
+          className="pointer clipboardSkip"
           style={
             {
               "--pointer-content": `"${getBulletedPointerContent(depth)}"`,
@@ -37,7 +37,7 @@ const ListItem = (props: ElementProps & { element: ListItemElement }) => {
       )}
       {listType === ListTypes.Numbered && <NumberedPointer element={element} />}
       {isTodoListItemElement(element) && (
-        <div contentEditable={false} className="pointer">
+        <div contentEditable={false} className="pointer clipboardSkip">
           <input
             className="checkbox-pointer"
             type="checkbox"
@@ -47,7 +47,7 @@ const ListItem = (props: ElementProps & { element: ListItemElement }) => {
         </div>
       )}
       <div>{children}</div>
-    </li>
+    </div>
   );
 };
 
@@ -63,7 +63,7 @@ const NumberedPointer = (props: { element: ListItemElement }) => {
   return (
     <button
       contentEditable={false}
-      className="pointer"
+      className="pointer clipboardSkip"
       style={
         {
           "--pointer-content": `"${getNumberedPointerContent(

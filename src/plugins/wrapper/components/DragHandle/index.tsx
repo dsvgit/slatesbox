@@ -7,7 +7,11 @@ type Props = {
 
 const DragHandle = ({ listeners }: Props) => {
   return (
-    <button contentEditable={false} className="handle" {...listeners}>
+    <button
+      contentEditable={false}
+      className="handle clipboardSkip"
+      {...listeners}
+    >
       ⠿
     </button>
   );

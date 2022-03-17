@@ -384,11 +384,11 @@ const pValue: Descendant[] = [
 const sValue: Descendant[] = [
   {
     type: "p",
-    children: [{ text: "First item" }],
+    children: [{ text: "" }],
   },
 ];
 
-const data: Descendant[] = [...listValue];
+const data: Descendant[] = [...sValue];
 
 data.forEach(assignIdRecursively);
 

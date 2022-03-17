@@ -6,6 +6,7 @@ import {
   BoldIcon,
   ItalicIcon,
   CodeIcon,
+  LinkIcon,
 } from "@primer/octicons-react";
 
 import { toggleList } from "plugins/list/transforms";
@@ -18,6 +19,7 @@ import {
   Heading2Type,
   Heading3Type,
 } from "plugins/heading/types";
+import { insertLink } from "plugins/link/transforms";
 
 const EditorToolbar = () => {
   const editor = useSlateStatic();
@@ -100,6 +102,20 @@ const EditorToolbar = () => {
           className="toolbar-button"
         >
           <TasklistIcon />
+        </button>
+
+        <button
+          onMouseDown={(e) => {
+            e.preventDefault();
+            const url = prompt("Link URL: ");
+
+            if (url) {
+              insertLink(editor, url);
+            }
+          }}
+          className="toolbar-button"
+        >
+          <LinkIcon />
         </button>
       </div>
 

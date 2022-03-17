@@ -14,6 +14,8 @@ import { ListItemElement } from "plugins/list/types";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { HashedElement, IdentityElement } from "slate-extended/types";
 import { FormattedText } from "plugins/marks/types";
+import { LinkElement } from "plugins/link/types";
+import { BlockquoteElement } from "plugins/blockquote/types";
 
 export type CustomEditor = BaseEditor &
   ReactEditor &
@@ -26,6 +28,8 @@ export type CustomElement =
   | Heading2Element
   | Heading3Element
   | ImageElement
+  | LinkElement
+  | BlockquoteElement
   | DividerElement
   | ListItemElement;
 

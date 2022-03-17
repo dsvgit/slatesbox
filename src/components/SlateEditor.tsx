@@ -25,6 +25,8 @@ import { autoformatRules } from "plugins/autoformat/autoformatRules";
 import { withResetType } from "plugins/resetType/withResetType";
 import { withDeserialize } from "plugins/serialization/withDeserialize";
 import { renderLeaf } from "plugins/marks/renderLeaf";
+import { withLink } from "plugins/link/withLink";
+import { withSerialize } from "plugins/serialization/withSerialize";
 
 const SlateEditor = () => {
   const editorRef = useRef<Editor>();
@@ -35,15 +37,20 @@ const SlateEditor = () => {
         withAutoformat(autoformatRules),
         withList,
         withDivider,
+        withLink,
         withImage,
         withExtended,
         withNodeId,
         withHistory,
         withReact,
+        withSerialize,
         withDeserialize,
       ],
       createEditor()
     );
+
+    // @ts-ignore
+    window.editor = editorRef.current;
   }
 
   const editor = editorRef.current;

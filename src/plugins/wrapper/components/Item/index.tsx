@@ -54,7 +54,7 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
       <DragHandle listeners={listeners} />
       <div
         {...attributes}
-        className={cn("item", {
+        className={cn("item", "clipboardSkipLinebreak", {
           dragging: isDragging,
           selected: selected,
           dragOverlay: isDragOverlay,
