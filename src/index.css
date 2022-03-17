@@ -98,6 +98,10 @@ h3 {
   margin-left: calc(40px + var(--spacing));
 }
 
+.item-container-list.dragging {
+  transition: 200ms margin-left;
+}
+
 .item {
   /*transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)*/
   /*  scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));*/

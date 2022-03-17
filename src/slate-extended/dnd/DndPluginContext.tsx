@@ -5,6 +5,7 @@ import {
   DndContext,
   DragEndEvent,
   DragMoveEvent,
+  DragOverEvent,
   DragOverlay,
   MeasuringStrategy,
   MouseSensor,
@@ -31,6 +32,7 @@ import {
 import { Item } from "plugins/wrapper/components/Item";
 import { isListItemElement } from "plugins/list/utils";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
+import { getDepth } from "slate-extended/dnd/utils";
 
 const measuring = {
   droppable: {
@@ -51,15 +53,25 @@ const DndPluginContext = ({
   children,
 }: React.PropsWithChildren<DndPluginContextProps>) => {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
   const [offsetLeft, setOffsetLeft] = useState<number>(0);
-
   const activeElement = editor.children.find(
     (x) => Element.isElement(x) && x.id === activeId
   );
-  const diffDepth = Math.round(offsetLeft / 50);
-  const dragDepth = isListItemElement(activeElement)
-    ? Math.max(0, activeElement.depth + diffDepth)
-    : 0;
+
+  const offsetDepth = Math.round(offsetLeft / 50);
+  const dragDepth = useMemo(
+    () =>
+      overId && isListItemElement(activeElement)
+        ? getDepth(
+            editor.children as Element[],
+            activeElement,
+            overId,
+            offsetDepth
+          )
+        : 0,
+    [editor.children, overId, activeElement, offsetDepth]
+  );
 
   const items = useMemo(
     () =>
@@ -102,10 +114,15 @@ const DndPluginContext = ({
     document.body.classList.add("dragging");
 
     setActiveId(active.id);
+    setOverId(active.id);
   }, []);
 
   const handleDragMove = ({ delta }: DragMoveEvent) => {
     setOffsetLeft(delta.x);
+  };
+
+  const handleDragOver = ({ over }: DragOverEvent) => {
+    setOverId(over?.id ?? null);
   };
 
   const handleDragEnd = useCallback(
@@ -182,6 +199,7 @@ const DndPluginContext = ({
         collisionDetection={sortableCollisionDetection}
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}
+        onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
         sensors={sensors}

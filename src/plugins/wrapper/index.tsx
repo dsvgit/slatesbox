@@ -67,6 +67,7 @@ const Wrapper = (
       data-slate-node-type={element.type}
       className={cn("item-container", "clipboardSkipLinebreak", {
         "item-container-list": isListItemElement(element),
+        dragging: activeId === id,
       })}
       style={
         {
