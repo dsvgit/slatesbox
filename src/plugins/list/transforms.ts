@@ -1,9 +1,9 @@
 import { Transforms, Editor, Element } from "slate";
+import { ReactEditor } from "slate-react";
 
 import { ListItemType, ListTypes } from "plugins/list/types";
 import { isListItemElement } from "plugins/list/utils";
 import { isParagraphElement } from "plugins/paragraph/utils";
-import { ReactEditor } from "slate-react";
 
 export const moveItemsForward = (editor: any, entry: any, maxDepth: any) => {
   const [node, path] = entry;

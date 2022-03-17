@@ -13,16 +13,13 @@ export const moveDndElements = (
     (x) => Element.isElement(x) && x.id === activeId
   ) as Element;
 
-  const foldedCount = isFoldingElement(element) ? element.foldedCount : 0;
+  // const foldedCount = isFoldingElement(element) ? element.foldedCount : 0;
 
-  const semanticDescendants =
-    ExtendedEditor.semanticDescendants(element)?.slice(0, foldedCount) || [];
+  const semanticDescendants = ExtendedEditor.semanticDescendants(element) || [];
 
   const match = (node: Node) =>
     node === element ||
-    (isFoldingElement(element) &&
-      Boolean(element.folded) &&
-      Element.isElement(node) &&
+    (Element.isElement(node) &&
       semanticDescendants.some((x) => x.element.id === node.id));
 
   Transforms.moveNodes(editor, {
@@ -43,19 +40,16 @@ export const moveDndDepth = (
     ) as Element;
 
     if (isListItemElement(element)) {
-      const foldedCount = isFoldingElement(element) ? element.foldedCount : 0;
+      // const foldedCount = isFoldingElement(element) ? element.foldedCount : 0;
 
       const semanticDescendants =
-        ExtendedEditor.semanticDescendants(element)?.slice(0, foldedCount) ||
-        [];
+        ExtendedEditor.semanticDescendants(element) || [];
 
       const depthDiff = element.depth - dragDepth;
 
       const match = (node: Node) =>
         node === element ||
-        (isFoldingElement(element) &&
-          Boolean(element.folded) &&
-          Element.isElement(node) &&
+        (Element.isElement(node) &&
           semanticDescendants.some((x) => x.element.id === node.id));
 
       const entries = Editor.nodes(editor, { at: [], match });

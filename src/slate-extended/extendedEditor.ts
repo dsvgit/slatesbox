@@ -167,4 +167,12 @@ export const ExtendedEditor = {
     const path = ExtendedEditor.semanticPath(element);
     return path.length > 1 ? path[path.length - 2] : null;
   },
+
+  isHiddenById(element: Element, id: string | null): boolean {
+    const path = ExtendedEditor.semanticPath(element);
+
+    const hidden = id != null && path.some((x) => x.element.id === id);
+
+    return hidden;
+  },
 };

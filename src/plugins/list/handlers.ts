@@ -9,6 +9,7 @@ import { moveItemsBack, moveItemsForward } from "plugins/list/transforms";
 export const onKeyDown = (editor: Editor) => (e: React.KeyboardEvent) => {
   if (isHotkey(["tab"], e)) {
     e.preventDefault();
+
     const entries = Array.from(
       Editor.nodes(editor, { match: isListItemElement })
     );

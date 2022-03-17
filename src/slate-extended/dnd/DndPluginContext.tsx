@@ -33,6 +33,7 @@ import { Item } from "plugins/wrapper/components/Item";
 import { isListItemElement } from "plugins/list/utils";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { getDepth } from "slate-extended/dnd/utils";
+import DragOverlayContent from "plugins/wrapper/components/DragOverlayContent";
 
 const measuring = {
   droppable: {
@@ -55,6 +56,7 @@ const DndPluginContext = ({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const [offsetLeft, setOffsetLeft] = useState<number>(0);
+  const [dragOverlayHeight, setDragOverlayHeight] = useState<number>(0);
   const activeElement = editor.children.find(
     (x) => Element.isElement(x) && x.id === activeId
   );
@@ -191,8 +193,9 @@ const DndPluginContext = ({
         () => ({
           activeId,
           dragDepth,
+          dragOverlayHeight,
         }),
-        [activeId, dragDepth]
+        [activeId, dragDepth, dragOverlayHeight]
       )}
     >
       <DndContext
@@ -227,11 +230,13 @@ const DndPluginContext = ({
               dragSourceOpacity: 0,
             }}
           >
-            {activeId && Element.isElement(activeElement) ? (
-              <Item element={activeElement} isDragOverlay={true}>
-                <DragOverlayContent element={activeElement} />
-              </Item>
-            ) : null}
+            {activeId && (
+              <DragOverlayContent
+                editor={editor}
+                activeId={activeId}
+                onHeightChange={(height) => setDragOverlayHeight(height)}
+              />
+            )}
           </DragOverlay>,
           document.body
         )}
@@ -242,19 +247,19 @@ const DndPluginContext = ({
 
 export default DndPluginContext;
 
-const DragOverlayContent = ({ element }: { element: Descendant }) => {
-  const overlayEditor = useMemo(() => withReact(createEditor()), []);
-  const content = [element];
-
-  return (
-    <div contentEditable={false}>
-      <Slate editor={overlayEditor} value={content} onChange={() => {}}>
-        <Editable
-          className="editable"
-          renderElement={renderElementContent}
-          readOnly={true}
-        />
-      </Slate>
-    </div>
-  );
-};
+// const DragOverlayContent = ({ element }: { element: Descendant }) => {
+//   const overlayEditor = useMemo(() => withReact(createEditor()), []);
+//   const content = [element];
+//
+//   return (
+//     <div contentEditable={false}>
+//       <Slate editor={overlayEditor} value={content} onChange={() => {}}>
+//         <Editable
+//           className="editable"
+//           renderElement={renderElementContent}
+//           readOnly={true}
+//         />
+//       </Slate>
+//     </div>
+//   );
+// };

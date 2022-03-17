@@ -1,13 +1,28 @@
 import { Element } from "slate";
 import { isListItemElement } from "plugins/list/utils";
-import { ListItemElement } from "plugins/list/types";
+import { ExtendedEditor } from "slate-extended/extendedEditor";
 
 export function getDepth(
   items: Element[],
-  activeItem: ListItemElement,
+  activeItem: Element,
   overId: string,
   offsetDepth: number
 ) {
+  const activeId = activeItem.id!;
+
+  if (!isListItemElement(activeItem)) {
+    return 0;
+  }
+
+  items = items.filter((element) => {
+    const semanticNode = ExtendedEditor.semanticNode(element);
+
+    const isHiddenById =
+      activeId !== element.id && ExtendedEditor.isHiddenById(element, activeId);
+
+    return !(semanticNode.hidden || isHiddenById);
+  });
+
   const activeItemIndex = items.indexOf(activeItem);
 
   const overItemIndex = items.findIndex(({ id }) => id === overId);

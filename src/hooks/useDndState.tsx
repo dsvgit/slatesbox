@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 type DndStateValue = {
   activeId: string | null;
   dragDepth: number;
+  dragOverlayHeight: number;
 };
 
 const DndStateContext = createContext<DndStateValue>({} as DndStateValue);

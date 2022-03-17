@@ -111,11 +111,16 @@ h3 {
 .item.dragging {
   z-index: 1;
   background-color: rgba(255, 255, 255, 0.3);
+  height: var(--drag-overlay-height, auto);
 }
 
 body.dragging .item {
   transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)
     scaleX(var(--scale-x, 1)) scaleY(var(--scale-y, 1));
+}
+
+body.dragging .handle {
+  display: none;
 }
 
 .item.dragging:not(.dragOverlay) {
@@ -286,6 +291,8 @@ body.dragging .item {
 .list-item {
   position: relative;
   list-style: none;
+  display: flex;
+  align-items: start;
 }
 
 .folding-pointer {
@@ -366,4 +373,13 @@ body.dragging .item {
   background: none;
   border: none;
   cursor: pointer;
+}
+
+.dragOverlayWrapper {
+  padding: 3px 0;
+  margin-left: var(--spacing, 0px);
+}
+
+.dragOverlay {
+  background-color: white;
 }

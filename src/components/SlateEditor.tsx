@@ -4,7 +4,6 @@ import { Slate, Editable, withReact, useSlate } from "slate-react";
 import { withHistory } from "slate-history";
 
 import { withImage } from "plugins/image/withImage";
-import initialValue from "initialValue";
 import DndPluginContext from "slate-extended/dnd/DndPluginContext";
 import useRenderElement from "hooks/useRenderElement";
 import { withDivider } from "plugins/divider/withDivider";
@@ -28,7 +27,15 @@ import { renderLeaf } from "plugins/marks/renderLeaf";
 import { withLink } from "plugins/link/withLink";
 import { withSerialize } from "plugins/serialization/withSerialize";
 
-const SlateEditor = () => {
+type Props = {
+  initialValue: Descendant[];
+  readOnly?: boolean;
+  renderElement?: EditableProps["renderElement"];
+};
+
+const SlateEditor = (props: Props) => {
+  const { initialValue, readOnly = false, renderElement } = props;
+
   const editorRef = useRef<Editor>();
   if (!editorRef.current) {
     editorRef.current = composePlugins(
@@ -75,10 +82,24 @@ const SlateEditor = () => {
           }}
           editor={editor}
         >
-          <EditorToolbar />
-          <Card>
-            <SlateEditable onKeyDown={onKeyDown} />
-          </Card>
+          {readOnly ? (
+            <SlateEditable
+              readOnly={readOnly}
+              onKeyDown={onKeyDown}
+              renderElement={renderElement}
+            />
+          ) : (
+            <Fragment>
+              <EditorToolbar />
+              <Card>
+                <SlateEditable
+                  readOnly={readOnly}
+                  renderElement={renderElement}
+                  onKeyDown={onKeyDown}
+                />
+              </Card>
+            </Fragment>
+          )}
         </DndPluginContext>
       </SlateExtended>
     </Slate>
@@ -94,7 +115,7 @@ const SlateEditable = (props: EditableProps) => {
     <Fragment>
       <Editable
         className="editable"
-        renderElement={renderElement}
+        renderElement={props.renderElement || renderElement}
         renderLeaf={renderLeaf}
         onKeyDown={props.onKeyDown}
       />
