@@ -60,7 +60,7 @@ const DndPluginContext = ({
     null
   );
   const minOverlayHeight = semanticNode
-    ? (semanticNode.descendants.length + 1) * 26
+    ? (semanticNode.descendants.filter((x) => !x.hidden).length + 1) * 26
     : 0;
   const dragOverlayHeight =
     _dragOverlayHeight &&
