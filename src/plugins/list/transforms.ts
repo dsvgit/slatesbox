@@ -1,10 +1,10 @@
-import { Transforms, Editor, Element, Path } from "slate";
+import { Transforms, Editor, Element, Path, Range } from "slate";
 import { ReactEditor } from "slate-react";
 
 import { ListItemType, ListTypes } from "plugins/list/types";
 import { isParagraphElement } from "plugins/paragraph/utils";
-import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { NestingElement } from "slate-extended/types";
+import { isListItemElement } from "plugins/list/utils";
 
 export const moveItemsForward = (
   editor: Editor,
@@ -60,14 +60,19 @@ export const toggleList = (
       editor,
       { type: ListItemType, listType },
       {
-        match: ExtendedEditor.isNestingElementCurried(editor),
+        match: isListItemElement,
       }
     );
 
     Transforms.setNodes(
       editor,
       { type: ListItemType, depth: 0, listType },
-      { match: (node) => isParagraphElement(node) }
+      {
+        match: (node, path) =>
+          Range.isExpanded(selection)
+            ? isParagraphElement(node)
+            : !isListItemElement(node) && path.length === 1,
+      }
     );
   });
 };
