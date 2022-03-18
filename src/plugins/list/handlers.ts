@@ -1,10 +1,10 @@
 import React from "react";
-import { Editor } from "slate";
+import { Editor, Path } from "slate";
 import isHotkey from "is-hotkey";
 
-import { getPreviousListItem } from "plugins/list/queries";
 import { moveItemsBack, moveItemsForward } from "plugins/list/transforms";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
+import { isListItemElement } from "plugins/list/utils";
 
 export const onKeyDown = (editor: Editor) => (e: React.KeyboardEvent) => {
   if (isHotkey(["tab"], e)) {
@@ -18,12 +18,16 @@ export const onKeyDown = (editor: Editor) => (e: React.KeyboardEvent) => {
 
     const [firstEntry] = entries;
     if (firstEntry) {
-      const prevEntry = getPreviousListItem(editor, firstEntry);
+      const path = firstEntry[1];
 
-      if (prevEntry) {
+      const prevEntry = Path.hasPrevious(path)
+        ? Editor.previous(editor, { at: path })!
+        : null;
+
+      if (prevEntry && isListItemElement(prevEntry[0])) {
         const [prevNode] = prevEntry;
         for (const entry of entries) {
-          moveItemsForward(editor, entry, prevNode.depth + 1);
+          moveItemsForward(editor, entry[0], entry[1], prevNode.depth + 1);
         }
       }
     }
@@ -35,7 +39,7 @@ export const onKeyDown = (editor: Editor) => (e: React.KeyboardEvent) => {
       match: ExtendedEditor.isNestingElementCurried(editor),
     });
     for (const entry of entries) {
-      moveItemsBack(editor, entry);
+      moveItemsBack(editor, entry[0], entry[1]);
     }
   }
 };

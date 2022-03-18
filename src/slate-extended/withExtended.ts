@@ -3,6 +3,8 @@ import { Editor, Range, Transforms, Path, Element } from "slate";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { ParagraphElement, ParagraphType } from "plugins/paragraph/types";
 import { ListItemElement, ListItemType, ListTypes } from "plugins/list/types";
+import { FoldingElement } from "slate-extended/types";
+import { nanoid } from "nanoid";
 
 export const withExtended =
   ({
@@ -27,10 +29,28 @@ export const withExtended =
           const prevEntry = Editor.previous(editor, { at: path })!;
 
           const node = prevEntry[0] as Element;
-          const { hidden, folded } = ExtendedEditor.semanticNode(node);
+          const { hidden } = ExtendedEditor.semanticNode(node);
+          const semanticPath = ExtendedEditor.semanticPath(node);
 
-          if (hidden && folded) {
-            Transforms.select(editor, Editor.end(editor, [folded.index]));
+          if (hidden) {
+            const start = [semanticPath[0].index];
+            const end = prevEntry[1];
+            const at = Editor.range(editor, start, end);
+
+            Transforms.setNodes(
+              editor,
+              { folded: false, foldedCount: 0 },
+              {
+                at,
+                match: (node) =>
+                  ExtendedEditor.isFoldingElement(editor, node) &&
+                  !!node.folded,
+              }
+            );
+
+            Transforms.setNodes(editor, { hash: nanoid(4) }, { at });
+
+            deleteBackward(unit);
             return;
           }
         }
@@ -41,9 +61,10 @@ export const withExtended =
 
     e.insertBreak = () => {
       const [entry] = Editor.nodes(editor, {
-        match: (node, path) =>
+        match: (node, path): node is Element & FoldingElement =>
           path.length === 1 &&
           ExtendedEditor.isFoldingElement(editor, node) &&
+          !!node.folded &&
           !!editor.selection &&
           Range.includes(editor.selection, Editor.end(editor, path)),
       });
@@ -51,21 +72,19 @@ export const withExtended =
       if (entry) {
         const [node, path] = entry;
 
-        if (ExtendedEditor.isFoldingElement(editor, node) && node.folded) {
-          const last = path[path.length - 1];
-          const skipCount = node.foldedCount || 0;
-          const at = path.slice(0, -1).concat(last + skipCount + 1);
+        const index = path[0];
+        const skipCount = node.foldedCount || 0;
+        const at = [index + skipCount + 1];
 
-          const newNode = ExtendedEditor.isNestingElement(editor, node)
-            ? getEmptyListItem({ depth: node.depth })
-            : getEmptyParagraph();
+        const newNode = ExtendedEditor.isNestingElement(editor, node)
+          ? getEmptyListItem({ depth: node.depth })
+          : getEmptyParagraph();
 
-          Transforms.insertNodes(editor, newNode, {
-            at,
-          });
-          Transforms.select(editor, Editor.end(editor, at));
-          return;
-        }
+        Transforms.insertNodes(editor, newNode, {
+          at,
+        });
+        Transforms.select(editor, Editor.end(editor, at));
+        return;
       }
 
       insertBreak();

@@ -1,17 +1,16 @@
-import { Editor, Transforms, BaseEditor, Element } from "slate";
+import { Editor, Transforms, BaseEditor } from "slate";
 
 import { isEmptyNode } from "queries";
 import { moveItemsBack } from "../transforms";
 import { ParagraphType } from "plugins/paragraph/types";
-import { ExtendedEditor } from "slate-extended/extendedEditor";
-import { NestingElement } from "slate-extended/types";
+import { isListItemElement } from "plugins/list/utils";
 
 const makeInsertBreak = (editor: Editor): BaseEditor["insertBreak"] => {
   const { insertBreak } = editor;
 
   return () => {
     const [entry] = Editor.nodes(editor, {
-      match: ExtendedEditor.isNestingElementCurried(editor),
+      match: isListItemElement,
       mode: "lowest",
     });
 
@@ -20,7 +19,7 @@ const makeInsertBreak = (editor: Editor): BaseEditor["insertBreak"] => {
 
       if (isEmptyNode(node)) {
         if (node.depth > 0) {
-          moveItemsBack(editor, entry);
+          moveItemsBack(editor, entry[0], entry[1]);
           return;
         } else {
           // turn list item into paragraph if it is empty

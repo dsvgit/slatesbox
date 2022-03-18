@@ -1,4 +1,4 @@
-import { Editor, Node, Element } from "slate";
+import { Editor, Node } from "slate";
 
 import { NestingElement } from "slate-extended/types";
 import { ExtendedEditor } from "slate-extended/extendedEditor";

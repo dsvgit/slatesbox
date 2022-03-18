@@ -364,6 +364,10 @@ const listValue: Descendant[] = [
     checked: false,
     children: [{ text: "Go to store" }],
   },
+  {
+    type: "p",
+    children: [{ text: "" }],
+  },
 ];
 
 const pValue: Descendant[] = [

@@ -28,6 +28,7 @@ import { withSerialize } from "plugins/serialization/withSerialize";
 import { compareLevels } from "components/utils";
 import withHeading from "plugins/heading/withHeading";
 import DragOverlayContent from "plugins/wrapper/components/DragOverlayContent";
+import { withTrailingLine } from "plugins/trailingLine/withTrailingLine";
 
 type Props = {
   initialValue: Descendant[];
@@ -42,6 +43,7 @@ const SlateEditor = (props: Props) => {
   if (!editorRef.current) {
     editorRef.current = composePlugins(
       [
+        withTrailingLine,
         withResetType,
         withAutoformat(autoformatRules),
         withList,

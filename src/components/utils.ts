@@ -1,4 +1,4 @@
-import { Editor, Element } from "slate";
+import { Editor, Element, Node } from "slate";
 
 import {
   isHeading1Element,
@@ -6,18 +6,28 @@ import {
   isHeading3Element,
 } from "plugins/heading/utils";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
+import { isParagraphElement } from "plugins/paragraph/utils";
 
-const getSemanticLevel = (element: Element) => {
-  if (isHeading1Element(element)) {
+const getSemanticLevel = (editor: Editor, element: Element) => {
+  if (
+    isParagraphElement(element) &&
+    Node.string(element) === "" &&
+    editor.children.length > 0 &&
+    editor.children[editor.children.length - 1].id === element.id
+  ) {
     return 1;
   }
 
-  if (isHeading2Element(element)) {
+  if (isHeading1Element(element)) {
     return 2;
   }
 
-  if (isHeading3Element(element)) {
+  if (isHeading2Element(element)) {
     return 3;
+  }
+
+  if (isHeading3Element(element)) {
+    return 4;
   }
 
   return Infinity;
@@ -31,5 +41,5 @@ export const compareLevels = (editor: Editor) => (a: Element, b: Element) => {
     return Math.sign(a.depth - b.depth);
   }
 
-  return Math.sign(getSemanticLevel(a) - getSemanticLevel(b));
+  return Math.sign(getSemanticLevel(editor, a) - getSemanticLevel(editor, b));
 };

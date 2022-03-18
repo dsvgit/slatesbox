@@ -1,28 +1,41 @@
-import { Editor, Transforms, BaseEditor, Element } from "slate";
+import { Editor, BaseEditor, Range, Path, Transforms, Node } from "slate";
 
-import { isEmptyNode } from "queries";
 import { moveItemsBack } from "plugins/list/transforms";
+import { isListItemElement } from "plugins/list/utils";
 import { ParagraphType } from "plugins/paragraph/types";
-import { ExtendedEditor } from "slate-extended/extendedEditor";
 
 const makeDeleteBackward = (editor: Editor): BaseEditor["deleteBackward"] => {
   const { deleteBackward } = editor;
 
-  return (unit: any) => {
-    const [entry] = Editor.nodes(editor, {
-      match: ExtendedEditor.isNestingElementCurried(editor),
-    });
+  return (unit) => {
+    if (editor.selection) {
+      const path = Editor.path(editor, editor.selection, { depth: 1 });
+      const [node] = Editor.node(editor, path);
+      const atStart = Range.includes(
+        editor.selection,
+        Editor.start(editor, path)
+      );
 
-    if (entry) {
-      const [node, path] = entry;
+      const isListItem = isListItemElement(node);
+      const previousEntry = Editor.previous(editor, { at: path })!;
+      const isPrevListItem =
+        Path.hasPrevious(path) && isListItemElement(previousEntry[0]);
 
-      if (isEmptyNode(node)) {
-        if (node.depth > 0) {
-          moveItemsBack(editor, entry);
-          return;
-        } else {
-          // turn list item into paragraph if it is empty
-          Transforms.setNodes(editor, { type: ParagraphType });
+      if (atStart) {
+        if (isListItem && !isPrevListItem) {
+          if (node.depth === 0) {
+            Transforms.setNodes(
+              editor,
+              {
+                type: ParagraphType,
+              },
+              {
+                at: path,
+              }
+            );
+          } else {
+            moveItemsBack(editor, node, path);
+          }
           return;
         }
       }

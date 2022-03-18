@@ -2,7 +2,7 @@ import React, { memo, Fragment } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import cn from "classnames";
 import { isIOS } from "react-device-detect";
-import { Element } from "slate";
+import { Element, Node, Range } from "slate";
 import { Transform } from "@dnd-kit/utilities";
 import { DraggableSyntheticListeners } from "@dnd-kit/core";
 
@@ -11,6 +11,8 @@ import DragHandle from "plugins/wrapper/components/DragHandle";
 import FoldingLine from "plugins/wrapper/components/FoldingLine";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { useSlateStatic } from "slate-react";
+import Placeholder from "plugins/wrapper/components/Placeholder";
+import { isParagraphElement } from "plugins/paragraph/utils";
 
 type SortableAttributes = ReturnType<typeof useSortable>["attributes"];
 export type ItemProps = {
@@ -55,6 +57,9 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
   return (
     <Fragment>
       <DragHandle listeners={listeners} />
+      {isParagraphElement(element) &&
+        Node.string(element) === "" &&
+        selected && <Placeholder />}
       <div
         {...attributes}
         className={cn("item", "clipboardSkipLinebreak", {

@@ -388,3 +388,20 @@ body.dragging .handle {
 .dragOverlayList {
   padding-left: 0;
 }
+
+.placeholder {
+  position: absolute;
+  cursor: pointer;
+  top: 3px;
+  left: 40px;
+  background: transparent;
+  border-radius: 8px;
+  vertical-align: middle;
+  text-align: start;
+  pointer-events: none;
+  user-select: none;
+  width: calc(100% - 46px);
+  overflow: hidden;
+  z-index: 1;
+  opacity: 0.3;
+}

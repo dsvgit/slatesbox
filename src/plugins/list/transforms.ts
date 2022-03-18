@@ -1,13 +1,17 @@
-import { Transforms, Editor, Element } from "slate";
+import { Transforms, Editor, Element, Path } from "slate";
 import { ReactEditor } from "slate-react";
 
 import { ListItemType, ListTypes } from "plugins/list/types";
 import { isParagraphElement } from "plugins/paragraph/utils";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
+import { NestingElement } from "slate-extended/types";
 
-export const moveItemsForward = (editor: any, entry: any, maxDepth: any) => {
-  const [node, path] = entry;
-
+export const moveItemsForward = (
+  editor: Editor,
+  node: NestingElement,
+  path: Path,
+  maxDepth: number
+) => {
   Transforms.setNodes(
     editor,
     { depth: Math.min(maxDepth, node.depth + 1) },
@@ -15,9 +19,11 @@ export const moveItemsForward = (editor: any, entry: any, maxDepth: any) => {
   );
 };
 
-export const moveItemsBack = (editor: any, entry: any) => {
-  const [node, path] = entry;
-
+export const moveItemsBack = (
+  editor: Editor,
+  node: NestingElement,
+  path: Path
+) => {
   Transforms.setNodes(
     editor,
     { depth: Math.max(0, node.depth - 1) },
