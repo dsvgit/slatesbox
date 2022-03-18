@@ -45,8 +45,6 @@ export const getListItemProps = (domNode: Element) => {
     checked,
   };
 };
-export const isMatchType = (domNode: Element, type: SlateElement["type"]) =>
-  domNode.getAttribute("data-slate-type") === type;
 
 export const isDOMList = (node: Node) =>
   node.nodeType === 1 && (node.nodeName === "UL" || node.nodeName === "OL");

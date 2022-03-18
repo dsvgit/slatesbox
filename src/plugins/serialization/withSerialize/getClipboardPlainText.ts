@@ -3,8 +3,8 @@ import {
   isDOMElement,
   isDOMText,
 } from "plugins/serialization/withSerialize/utils";
-import { getListItemProps, isMatchType } from "plugins/serialization/utils";
-import { ListItemType, ListTypes } from "plugins/list/types";
+import { getListItemProps, isDOMListItem } from "plugins/serialization/utils";
+import { ListTypes } from "plugins/list/types";
 
 export const getClipboardPlainText = (domNode: any) => {
   let text = "";
@@ -13,7 +13,7 @@ export const getClipboardPlainText = (domNode: any) => {
     return domNode.nodeValue;
   }
 
-  if (isDOMElement(domNode) && isMatchType(domNode, ListItemType)) {
+  if (isDOMElement(domNode) && isDOMListItem(domNode)) {
     let listItemText = "";
     for (const childNode of Array.from(domNode.childNodes)) {
       listItemText += getPlainText(childNode);
