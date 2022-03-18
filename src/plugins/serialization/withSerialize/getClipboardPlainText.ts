@@ -56,5 +56,5 @@ export const getClipboardPlainText = (domNode: any) => {
     }
   }
 
-  return text;
+  return text.replace(new RegExp(String.fromCharCode(160), "g"), " ");
 };

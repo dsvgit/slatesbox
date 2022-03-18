@@ -14,7 +14,6 @@ import * as markHandlers from "plugins/marks/handlers";
 import withList from "plugins/list/withList";
 import EditorToolbar from "components/EditorToolbar";
 import SlateExtended from "slate-extended/SlateExtended";
-import { compareLevels } from "slate-extended/utils";
 import Card from "components/Card";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { withExtended } from "slate-extended/withExtended";
@@ -26,6 +25,9 @@ import { withDeserialize } from "plugins/serialization/withDeserialize";
 import { renderLeaf } from "plugins/marks/renderLeaf";
 import { withLink } from "plugins/link/withLink";
 import { withSerialize } from "plugins/serialization/withSerialize";
+import { compareLevels } from "components/utils";
+import withHeading from "plugins/heading/withHeading";
+import DragOverlayContent from "plugins/wrapper/components/DragOverlayContent";
 
 type Props = {
   initialValue: Descendant[];
@@ -44,20 +46,20 @@ const SlateEditor = (props: Props) => {
         withAutoformat(autoformatRules),
         withList,
         withDivider,
+        withHeading,
         withLink,
         withImage,
-        withExtended,
+        withSerialize,
+        withDeserialize,
+        withExtended({
+          compareLevels,
+        }),
         withNodeId,
         withHistory,
         withReact,
-        withSerialize,
-        withDeserialize,
       ],
       createEditor()
     );
-
-    // @ts-ignore
-    window.editor = editorRef.current;
   }
 
   const editor = editorRef.current;
@@ -73,31 +75,30 @@ const SlateEditor = (props: Props) => {
     forceRerender((x) => x + 1); // after dnd ends then ReactEditor.focus call, to continue typing
   }, []);
 
+  const renderedEditor = (
+    <SlateEditable
+      readOnly={readOnly}
+      onKeyDown={onKeyDown}
+      renderElement={renderElement}
+    />
+  );
+
   return (
     <Slate editor={editor} value={value} onChange={setValue}>
-      <SlateExtended compareLevels={compareLevels}>
+      <SlateExtended>
         <DndPluginContext
           onDragEnd={() => {
             forceRerender((x) => x + 1); // after dnd ends to provide the right DragOverlay drop animation
           }}
           editor={editor}
+          renderDragOverlay={(props) => <DragOverlayContent {...props} />}
         >
           {readOnly ? (
-            <SlateEditable
-              readOnly={readOnly}
-              onKeyDown={onKeyDown}
-              renderElement={renderElement}
-            />
+            renderedEditor
           ) : (
             <Fragment>
               <EditorToolbar />
-              <Card>
-                <SlateEditable
-                  readOnly={readOnly}
-                  renderElement={renderElement}
-                  onKeyDown={onKeyDown}
-                />
-              </Card>
+              <Card>{renderedEditor}</Card>
             </Fragment>
           )}
         </DndPluginContext>

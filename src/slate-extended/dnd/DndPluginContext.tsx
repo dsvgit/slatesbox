@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { Editor, Transforms } from "slate";
+import { Editor, Transforms, Element } from "slate";
 import {
   AutoScrollActivator,
   DndContext,
@@ -22,12 +22,10 @@ import { DragStartEvent } from "@dnd-kit/core/dist/types";
 import { ReactEditor } from "slate-react";
 import { createPortal } from "react-dom";
 
-import { DndStateProvider } from "hooks/useDndState";
+import { DndStateProvider } from "slate-extended/dnd/useDndState";
 import { sortableCollisionDetection } from "slate-extended/dnd/sortableCollisionDetection";
 import { moveDndTransform } from "slate-extended/transforms/moveDndTransform";
-import { isListItemElement } from "plugins/list/utils";
 import { getDepth } from "slate-extended/dnd/utils";
-import DragOverlayContent from "plugins/wrapper/components/DragOverlayContent";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 
 const measuring = {
@@ -40,12 +38,18 @@ type DndPluginContextProps = {
   editor: Editor;
   onDragStart?(event: DragStartEvent): void;
   onDragEnd?(event: DragEndEvent): void;
+  renderDragOverlay: (props: {
+    editor: Editor;
+    activeId: string;
+    onHeightChange: (height: number) => void;
+  }) => React.ReactElement;
 };
 
 const DndPluginContext = ({
   editor,
   onDragStart,
   onDragEnd,
+  renderDragOverlay,
   children,
 }: React.PropsWithChildren<DndPluginContextProps>) => {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -64,7 +68,8 @@ const DndPluginContext = ({
     : 0;
   const dragOverlayHeight =
     _dragOverlayHeight &&
-    isListItemElement(activeElement) &&
+    ExtendedEditor.isFoldingElement(editor, activeElement) &&
+    ExtendedEditor.isNestingElement(editor, activeElement) &&
     !activeElement.folded
       ? Math.max(minOverlayHeight, _dragOverlayHeight)
       : null;
@@ -72,8 +77,8 @@ const DndPluginContext = ({
   const offsetDepth = Math.round(offsetLeft / 50);
   const dragDepth = useMemo(
     () =>
-      overId && isListItemElement(activeElement)
-        ? getDepth(editor.children, activeElement, overId, offsetDepth)
+      overId && Element.isElement(activeElement)
+        ? getDepth(editor, editor.children, activeElement, overId, offsetDepth)
         : 0,
     [editor.children, overId, activeElement, offsetDepth]
   );
@@ -200,13 +205,12 @@ const DndPluginContext = ({
               dragSourceOpacity: 0,
             }}
           >
-            {activeId && (
-              <DragOverlayContent
-                editor={editor}
-                activeId={activeId}
-                onHeightChange={(height) => setDragOverlayHeight(height)}
-              />
-            )}
+            {activeId &&
+              renderDragOverlay({
+                editor,
+                activeId,
+                onHeightChange: (height) => setDragOverlayHeight(height),
+              })}
           </DragOverlay>,
           document.body
         )}

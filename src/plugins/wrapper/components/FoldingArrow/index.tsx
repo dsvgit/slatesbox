@@ -3,8 +3,6 @@ import { Element } from "slate";
 import { useSlate } from "slate-react";
 import cn from "classnames";
 
-import { isFoldingElement } from "slate-extended/utils";
-import { isListItemElement } from "plugins/list/utils";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 
 type Props = {
@@ -21,13 +19,13 @@ const FoldingArrow = (props: Props & { element: Element }) => {
   }, [editor.children]);
 
   if (
-    isFoldingElement(element) &&
+    ExtendedEditor.isFoldingElement(editor, element) &&
     ExtendedEditor.semanticNode(element).children.length > 0
   ) {
     return (
       <FoldingArrowMemoized
         folded={Boolean(element.folded)}
-        isList={isListItemElement(element)}
+        isList={ExtendedEditor.isNestingElement(editor, element)}
         onFold={onFold}
       />
     );

@@ -1,10 +1,10 @@
 import { Element } from "slate";
 
 import {
-  ListItemType,
   ListItemElement,
-  TodoListItemElement,
+  ListItemType,
   ListTypes,
+  TodoListItemElement,
 } from "./types";
 
 export const isListItemElement = (value: any): value is ListItemElement => {

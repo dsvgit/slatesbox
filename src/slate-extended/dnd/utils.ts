@@ -1,8 +1,9 @@
-import { Element } from "slate";
-import { isListItemElement } from "plugins/list/utils";
+import { Editor, Element } from "slate";
+
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 
 export function getDepth(
+  editor: Editor,
   items: Element[],
   activeItem: Element,
   overId: string,
@@ -10,7 +11,7 @@ export function getDepth(
 ) {
   const activeId = activeItem.id!;
 
-  if (!isListItemElement(activeItem)) {
+  if (!ExtendedEditor.isNestingElement(editor, activeItem)) {
     return 0;
   }
 
@@ -31,8 +32,12 @@ export function getDepth(
   const previousItem = newItems[overItemIndex - 1];
   const nextItem = newItems[overItemIndex + 1];
 
-  const maxDepth = isListItemElement(previousItem) ? previousItem.depth + 1 : 0;
-  const minDepth = isListItemElement(nextItem) ? nextItem.depth : 0;
+  const maxDepth = ExtendedEditor.isNestingElement(editor, previousItem)
+    ? previousItem.depth + 1
+    : 0;
+  const minDepth = ExtendedEditor.isNestingElement(editor, nextItem)
+    ? nextItem.depth
+    : 0;
 
   const projectedDepth = activeItem.depth + offsetDepth;
   let dragDepth = projectedDepth;

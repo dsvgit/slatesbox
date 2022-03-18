@@ -2,8 +2,6 @@ import { Node, Editor, Element, Transforms } from "slate";
 import { Active, Over } from "@dnd-kit/core";
 
 import { ExtendedEditor } from "slate-extended/extendedEditor";
-import { isListItemElement } from "plugins/list/utils";
-import { isFoldingElement } from "slate-extended/utils";
 
 export const moveDndTransform = (
   editor: Editor,
@@ -18,6 +16,7 @@ export const moveDndTransform = (
 
   if (activeIndex < overIndex) {
     const droppableIntervals = ExtendedEditor.getDroppableIntervals(
+      editor,
       editor.semanticChildren,
       editor.children.length
     );
@@ -36,7 +35,10 @@ export const moveDndTransform = (
     moveDndElements(editor, active.id, overIndex);
   }
 
-  if (isListItemElement(element) && element.depth !== dragDepth) {
+  if (
+    ExtendedEditor.isNestingElement(editor, element) &&
+    element.depth !== dragDepth
+  ) {
     updateDndDepth(editor, active.id, dragDepth);
   }
 };
@@ -52,8 +54,10 @@ export const moveDndElements = (
     return;
   }
 
-  const foldedCount = isFoldingElement(element) ? element.foldedCount || 0 : 0;
-  const semanticDescendants = isListItemElement(element)
+  const foldedCount = ExtendedEditor.isFoldingElement(editor, element)
+    ? element.foldedCount || 0
+    : 0;
+  const semanticDescendants = ExtendedEditor.isNestingElement(editor, element)
     ? ExtendedEditor.semanticDescendants(element)
     : ExtendedEditor.semanticDescendants(element)?.slice(0, foldedCount);
 
@@ -77,11 +81,14 @@ export const updateDndDepth = (
   Editor.withoutNormalizing(editor, () => {
     const element = editor.children.find((x) => x.id === activeId);
 
-    if (isListItemElement(element)) {
-      const foldedCount = isFoldingElement(element)
+    if (ExtendedEditor.isNestingElement(editor, element)) {
+      const foldedCount = ExtendedEditor.isFoldingElement(editor, element)
         ? element.foldedCount || 0
         : 0;
-      const semanticDescendants = isListItemElement(element)
+      const semanticDescendants = ExtendedEditor.isNestingElement(
+        editor,
+        element
+      )
         ? ExtendedEditor.semanticDescendants(element)
         : ExtendedEditor.semanticDescendants(element)?.slice(0, foldedCount);
 
@@ -95,7 +102,7 @@ export const updateDndDepth = (
       const entries = Editor.nodes(editor, { at: [], match });
 
       for (let [node] of entries) {
-        if (isListItemElement(node)) {
+        if (ExtendedEditor.isNestingElement(editor, node)) {
           Transforms.setNodes(
             editor,
             {

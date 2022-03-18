@@ -32,7 +32,11 @@ const Link = (props: ElementProps & { element: LinkElement }) => {
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1249405
 // copied from slate inlines examples
 const InlineChromiumBugfix = () => (
-  <span contentEditable={false} style={{ fontSize: 0 }}>
+  <span
+    contentEditable={false}
+    className="clipboardSkip"
+    style={{ fontSize: 0 }}
+  >
     ${String.fromCodePoint(160) /* Non-breaking space */}
   </span>
 );

@@ -4,15 +4,11 @@ import { useSlate } from "slate-react";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { ELEMENT_TO_SEMANTIC_PATH } from "slate-extended/weakMaps";
 
-const SlateExtended = (props: {
-  children: React.ReactNode;
-  compareLevels: ExtendedEditor["compareLevels"];
-}) => {
+const SlateExtended = (props: { children: React.ReactNode }) => {
   const editor = useSlate();
-  const { children, compareLevels } = props;
+  const { children } = props;
 
   const initializeExtendedEditor = () => {
-    editor.compareLevels = compareLevels;
     editor.semanticChildren = ExtendedEditor.getSemanticChildren(
       editor,
       editor.children,

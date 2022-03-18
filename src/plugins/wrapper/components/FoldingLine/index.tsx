@@ -4,8 +4,6 @@ import { ReactEditor, useSlate } from "slate-react";
 import { getClientRect } from "@dnd-kit/core";
 
 import { ExtendedEditor } from "slate-extended/extendedEditor";
-import { isListItemElement } from "plugins/list/utils";
-import { isFoldingElement } from "slate-extended/utils";
 
 type Props = {
   onFold?: React.MouseEventHandler;
@@ -17,8 +15,8 @@ const FoldingLine = (props: Props & { element: Element }) => {
   const [height, setHeight] = useState(0);
 
   const hasFoldingLine =
-    isListItemElement(element) &&
-    isFoldingElement(element) &&
+    ExtendedEditor.isNestingElement(editor, element) &&
+    ExtendedEditor.isFoldingElement(editor, element) &&
     ExtendedEditor.semanticNode(element).children.length > 0;
 
   useEffect(() => {

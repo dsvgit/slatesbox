@@ -1,4 +1,4 @@
-import { Editor } from "slate";
+import { Editor, Node } from "slate";
 import { deserializeHtml, parseHtmlDocument } from "@udecode/plate-core";
 
 import { deserializePlugins } from "plugins/serialization/withDeserialize/deserializePlugins";
@@ -15,11 +15,13 @@ export const withDeserialize = (editor: Editor) => {
       return true;
     }
 
-    const html = data.getData("text/html");
+    let html = data.getData("text/html");
 
     if (!html) {
       return false;
     }
+
+    html = html.replace(new RegExp(String.fromCharCode(160), "g"), " "); // replace whitespaces 160 to 32, they could be at links edges
 
     const document = new DOMParser().parseFromString(html, "text/html");
 
@@ -35,8 +37,6 @@ export const withDeserialize = (editor: Editor) => {
     );
 
     if (htmlFragment) {
-      // @ts-ignore
-      window.lastFragment = htmlFragment;
       editor.insertFragment(htmlFragment);
       return true;
     }

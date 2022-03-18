@@ -1,14 +1,14 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Editor } from "slate";
+import { useSlateStatic } from "slate-react";
 import { clone } from "ramda";
+import cn from "classnames";
+import { useResizeDetector } from "react-resize-detector";
 
 import SlateEditor from "components/SlateEditor";
 import { renderElementContent } from "hooks/useRenderElement";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
-import { isListItemElement } from "plugins/list/utils";
 import { RenderElementProps } from "slate-react/dist/components/editable";
-import { useResizeDetector } from "react-resize-detector";
-import cn from "classnames";
 
 type Props = {
   editor: Editor;
@@ -29,7 +29,7 @@ const DragOverlayContent = (props: Props) => {
 
   const initialValue = useMemo(() => {
     let content;
-    if (isListItemElement(element)) {
+    if (ExtendedEditor.isNestingElement(editor, element)) {
       const semanticNode = ExtendedEditor.semanticNode(element);
       const { descendants } = semanticNode;
       const baseDepth = element.depth;
@@ -44,7 +44,7 @@ const DragOverlayContent = (props: Props) => {
       );
 
       content.forEach((element) => {
-        if (isListItemElement(element)) {
+        if (ExtendedEditor.isNestingElement(editor, element)) {
           element.depth -= baseDepth;
         }
       });
@@ -55,12 +55,14 @@ const DragOverlayContent = (props: Props) => {
     return content;
   }, [editor.children, activeId]);
 
+  const renderDragOverlayElement = useRenderDragOverlayElement(editor);
+
   return (
     <div
       ref={ref}
       contentEditable={false}
       className={cn("dragOverlay", {
-        dragOverlayList: isListItemElement(element),
+        dragOverlayList: ExtendedEditor.isNestingElement(editor, element),
       })}
     >
       {element && (
@@ -76,8 +78,11 @@ const DragOverlayContent = (props: Props) => {
 
 const DragOverlayWrapper = (props: RenderElementProps) => {
   const { element, children } = props;
+  const editor = useSlateStatic();
 
-  const realSpacing = isListItemElement(element) ? 50 * element.depth : 0;
+  const realSpacing = ExtendedEditor.isNestingElement(editor, element)
+    ? 50 * element.depth
+    : 0;
 
   return (
     <div
@@ -93,18 +98,25 @@ const DragOverlayWrapper = (props: RenderElementProps) => {
   );
 };
 
-const renderDragOverlayElement = (props: RenderElementProps) => {
-  if (isListItemElement(props.element)) {
-    const { attributes, element } = props;
+const useRenderDragOverlayElement = (editor: Editor) => {
+  const renderDragOverlayElement = useCallback(
+    (props) => {
+      if (ExtendedEditor.isNestingElement(editor, props.element)) {
+        const { attributes, element } = props;
 
-    return (
-      <DragOverlayWrapper attributes={attributes} element={element}>
-        {renderElementContent(props)}
-      </DragOverlayWrapper>
-    );
-  }
+        return (
+          <DragOverlayWrapper attributes={attributes} element={element}>
+            {renderElementContent(props)}
+          </DragOverlayWrapper>
+        );
+      }
 
-  return renderElementContent(props);
+      return renderElementContent(props);
+    },
+    [editor]
+  );
+
+  return renderDragOverlayElement;
 };
 
 export default DragOverlayContent;

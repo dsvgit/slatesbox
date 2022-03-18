@@ -1,14 +1,14 @@
 import React, { useCallback } from "react";
 import { RenderElementProps, useSelected, useSlateStatic } from "slate-react";
+import cn from "classnames";
 
-import { useDndState } from "hooks/useDndState";
+import { useDndState } from "slate-extended/dnd/useDndState";
 import useWrapperIntersectionObserver from "plugins/wrapper/useWrapperIntersectionObserver";
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { foldElement } from "slate-extended/transforms/foldElement";
 import { Sortable } from "plugins/wrapper/components/Sortable";
 import { Item, ItemProps } from "plugins/wrapper/components/Item";
-import { isListItemElement, isTodoListItemElement } from "plugins/list/utils";
-import cn from "classnames";
+import { isTodoListItemElement } from "plugins/list/utils";
 import { makeListItemAttributes } from "plugins/serialization/utils";
 
 const Wrapper = (
@@ -25,7 +25,7 @@ const Wrapper = (
   const semanticNode = ExtendedEditor.semanticNode(element);
   const { listIndex } = semanticNode;
   const isHiddenById =
-    isListItemElement(activeElement) &&
+    ExtendedEditor.isNestingElement(editor, activeElement) &&
     activeId !== id &&
     ExtendedEditor.isHiddenById(element, activeId);
   const hidden = semanticNode.hidden || isHiddenById;
@@ -54,15 +54,17 @@ const Wrapper = (
   };
 
   const isDragging = activeId === id;
-  const realSpacing = isListItemElement(element) ? 50 * element.depth : 0;
+  const realSpacing = ExtendedEditor.isNestingElement(editor, element)
+    ? 50 * element.depth
+    : 0;
   const dragSpacing = 50 * dragDepth;
 
-  const Tag = isListItemElement(element) ? "li" : "div";
+  const Tag = ExtendedEditor.isNestingElement(editor, element) ? "li" : "div";
 
   return (
     <Tag
       {...attributes}
-      {...(isListItemElement(element)
+      {...(ExtendedEditor.isNestingElement(editor, element)
         ? makeListItemAttributes({
             depth: element.depth,
             listType: element.listType,
@@ -72,7 +74,7 @@ const Wrapper = (
         : {})}
       data-slate-node-type={element.type}
       className={cn("item-container", "clipboardSkipLinebreak", {
-        "item-container-list": isListItemElement(element),
+        "item-container-list": ExtendedEditor.isNestingElement(editor, element),
         dragging: activeId === id,
       })}
       style={

@@ -1,4 +1,4 @@
-import { Element } from "slate";
+import { BaseElement, Element } from "slate";
 
 export interface IdentityElement {
   id?: string;
@@ -11,6 +11,10 @@ export interface HashedElement {
 export type FoldingElement = {
   folded?: boolean;
   foldedCount?: number;
+};
+
+export type NestingElement = {
+  depth: number;
 };
 
 export type SemanticNode<T extends Element = Element> = {

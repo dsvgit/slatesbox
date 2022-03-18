@@ -2,7 +2,6 @@ import React, { memo, Fragment } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import cn from "classnames";
 import { isIOS } from "react-device-detect";
-import { isListItemElement } from "plugins/list/utils";
 import { Element } from "slate";
 import { Transform } from "@dnd-kit/utilities";
 import { DraggableSyntheticListeners } from "@dnd-kit/core";
@@ -10,6 +9,8 @@ import { DraggableSyntheticListeners } from "@dnd-kit/core";
 import FoldingArrow from "plugins/wrapper/components/FoldingArrow";
 import DragHandle from "plugins/wrapper/components/DragHandle";
 import FoldingLine from "plugins/wrapper/components/FoldingLine";
+import { ExtendedEditor } from "slate-extended/extendedEditor";
+import { useSlateStatic } from "slate-react";
 
 type SortableAttributes = ReturnType<typeof useSortable>["attributes"];
 export type ItemProps = {
@@ -49,6 +50,8 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
     attributes,
   } = props;
 
+  const editor = useSlateStatic();
+
   return (
     <Fragment>
       <DragHandle listeners={listeners} />
@@ -61,7 +64,7 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
           disableSelection: isIOS && isSorting,
           disableInteraction: isSorting,
           hidden: hidden,
-          "item-list": isListItemElement(element),
+          "item-list": ExtendedEditor.isNestingElement(editor, element),
           // indicator: isDragging,
         })}
         style={
@@ -83,9 +86,10 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
     </Fragment>
   );
 };
+
 export const Item = memo(ItemComponent, (prev, next) => {
   for (const key of [...Object.keys(prev), ...Object.keys(next)]) {
-    if (key === "children") {
+    if (key === "children" || key === "transition" || key === "listeners") {
       continue;
     }
 

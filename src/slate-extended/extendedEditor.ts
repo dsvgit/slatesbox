@@ -1,20 +1,25 @@
-import { BaseEditor, Descendant, Element } from "slate";
+import { BaseEditor, Descendant, Editor, Element } from "slate";
 
-import { SemanticNode } from "slate-extended/types";
+import {
+  FoldingElement,
+  NestingElement,
+  SemanticNode,
+} from "slate-extended/types";
 import { ELEMENT_TO_SEMANTIC_PATH } from "slate-extended/weakMaps";
-import { crawlChildren, isFoldingElement } from "slate-extended/utils";
-import { isListItemElement } from "plugins/list/utils";
+import { crawlChildren } from "slate-extended/utils";
 
 export interface ExtendedEditor extends BaseEditor {
   children: Element[];
   compareLevels: (a: Element, b: Element) => number;
+  isFoldingElement: (element: any) => boolean;
+  isNestingElement: (element: any) => boolean;
   semanticChildren: SemanticNode[];
   getSemanticChildren: (children: Descendant[]) => SemanticNode[];
 }
 
 export const ExtendedEditor = {
   getSemanticChildren(
-    { compareLevels }: Pick<ExtendedEditor, "compareLevels">,
+    editor: Editor,
     children: Descendant[],
     options: { setPath?: (element: Element, path: SemanticNode[]) => void } = {}
   ) {
@@ -32,7 +37,7 @@ export const ExtendedEditor = {
       }
 
       const edgeIndex = path.findIndex(
-        (p) => compareLevels(p.element, element) !== -1
+        (p) => editor.compareLevels(p.element, element) !== -1
       );
 
       if (edgeIndex !== -1) {
@@ -42,7 +47,7 @@ export const ExtendedEditor = {
 
       // calculate list index
       let listIndex = 0;
-      if (isListItemElement(element)) {
+      if (ExtendedEditor.isNestingElement(editor, element)) {
         // init counter
         if (depthCounters[element.depth] == null) {
           depthCounters[element.depth] = 0;
@@ -66,9 +71,16 @@ export const ExtendedEditor = {
       let hidden = false;
       const folded = [...path]
         .reverse()
-        .find((node) => isFoldingElement(node.element) && node.element.folded);
+        .find(
+          (node) =>
+            ExtendedEditor.isFoldingElement(editor, node.element) &&
+            node.element.folded
+        );
       if (folded) {
-        const foldedCount = isFoldingElement(folded.element)
+        const foldedCount = ExtendedEditor.isFoldingElement(
+          editor,
+          folded.element
+        )
           ? folded.element.foldedCount ?? 0
           : 0;
         hidden = foldedCount >= index - folded.index;
@@ -105,6 +117,7 @@ export const ExtendedEditor = {
   },
 
   getDroppableIntervals(
+    editor: Editor,
     semanticChildren: SemanticNode[],
     contentLength: number
   ): [number, number][] {
@@ -121,7 +134,11 @@ export const ExtendedEditor = {
           return;
         }
 
-        if (isFoldingElement(element) && element.folded && children.length) {
+        if (
+          ExtendedEditor.isFoldingElement(editor, element) &&
+          element.folded &&
+          children.length
+        ) {
           skipCount = element.foldedCount || 0;
         }
 
@@ -175,5 +192,29 @@ export const ExtendedEditor = {
     const hidden = id != null && path.some((x) => x.element.id === id);
 
     return hidden;
+  },
+
+  isFoldingElementCurried(editor: Editor) {
+    return (element: any): element is Element & FoldingElement =>
+      ExtendedEditor.isFoldingElement(editor, element);
+  },
+
+  isFoldingElement(
+    editor: Editor,
+    element: any
+  ): element is Element & FoldingElement {
+    return editor.isFoldingElement(element);
+  },
+
+  isNestingElementCurried(editor: Editor) {
+    return (element: any): element is Element & NestingElement =>
+      ExtendedEditor.isNestingElement(editor, element);
+  },
+
+  isNestingElement(
+    editor: Editor,
+    element: any
+  ): element is Element & NestingElement {
+    return editor.isNestingElement(element);
   },
 };

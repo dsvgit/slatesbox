@@ -2,7 +2,6 @@ import { Editor, Element, Range, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
 
 import { ExtendedEditor } from "slate-extended/extendedEditor";
-import { isFoldingElement } from "slate-extended/utils";
 import { updateHash } from "slate-extended/transforms/updateHash";
 import { SemanticNode } from "slate-extended/types";
 
@@ -10,7 +9,7 @@ export const foldElement = (editor: Editor, element: Element) => {
   const path = ReactEditor.findPath(editor, element);
   const semanticDescendants = ExtendedEditor.semanticDescendants(element);
 
-  if (isFoldingElement(element)) {
+  if (ExtendedEditor.isFoldingElement(editor, element)) {
     Editor.withoutNormalizing(editor, () => {
       const index = path[0];
 
@@ -66,7 +65,7 @@ const updateFoldedCount = (editor: Editor, semanticNode: SemanticNode) => {
 
   const semanticDescendants = ExtendedEditor.semanticDescendants(element);
 
-  if (isFoldingElement(element) && element.folded) {
+  if (ExtendedEditor.isFoldingElement(editor, element) && element.folded) {
     Transforms.setNodes(
       editor,
       { foldedCount: semanticDescendants.length },

@@ -1,15 +1,15 @@
 import { Descendant } from "slate";
 
-import {FoldingElement} from "slate-extended/types";
+import { FoldingElement, NestingElement } from "slate-extended/types";
 
 export type ListItemType = "list_item";
 export const ListItemType: ListItemType = "list_item";
 
 type BaseListItemElement = {
   type: ListItemType;
-  depth: number;
   children: Descendant[];
-} & FoldingElement;
+} & NestingElement &
+  FoldingElement;
 
 export enum ListTypes {
   Bulleted = "bulleted",

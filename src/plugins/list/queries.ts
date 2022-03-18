@@ -1,11 +1,13 @@
 import { Editor, NodeEntry } from "slate";
+import { ExtendedEditor } from "slate-extended/extendedEditor";
 
-import { isListItemElement } from "plugins/list/utils";
-
-export const getPreviousListItem = (editor: Editor, [node, path]: NodeEntry) => {
+export const getPreviousListItem = (
+  editor: Editor,
+  [node, path]: NodeEntry
+) => {
   const previousEntry = Editor.previous(editor, {
     at: path,
-    match: isListItemElement, // check if it is a list
+    match: ExtendedEditor.isNestingElementCurried(editor), // check if it is a list
   });
 
   return previousEntry;
@@ -14,7 +16,7 @@ export const getPreviousListItem = (editor: Editor, [node, path]: NodeEntry) => 
 export const getNextListItem = (editor: Editor, [node, path]: NodeEntry) => {
   const nextEntry = Editor.next(editor, {
     at: path,
-    match: isListItemElement, // check if it is a list
+    match: ExtendedEditor.isNestingElementCurried(editor), // check if it is a list
   });
 
   return nextEntry;
