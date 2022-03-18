@@ -10,12 +10,12 @@ type Props = {
 };
 
 const FoldingArrow = (props: Props & { element: Element }) => {
-  const [_, setState] = useState(0);
+  const [, forceRerender] = useState(0);
   const editor = useSlate();
   const { element, onFold } = props;
 
   useEffect(() => {
-    setState((state) => state + 1);
+    forceRerender((state) => state + 1);
   }, [editor.children]);
 
   if (

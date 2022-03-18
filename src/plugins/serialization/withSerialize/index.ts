@@ -19,6 +19,13 @@ export const withSerialize = (editor: Editor) => {
   editor.setFragmentData = (data) => {
     setFragmentData(data);
 
+    const fragment = data.getData("application/x-slate-fragment");
+
+    if (fragment) {
+      const decoded = decodeURIComponent(window.atob(fragment));
+      console.log(decoded);
+    }
+
     const clipboardNode = getClipboardDataHtmlNode(data);
     removeSkippedElements(clipboardNode);
 

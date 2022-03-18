@@ -19,7 +19,7 @@ import {
   Heading2Type,
   Heading3Type,
 } from "plugins/heading/types";
-import { insertLink } from "plugins/link/transforms";
+import { insertLink, unwarpLinks } from "plugins/link/transforms";
 
 const EditorToolbar = () => {
   const editor = useSlateStatic();
@@ -116,6 +116,28 @@ const EditorToolbar = () => {
           className="toolbar-button"
         >
           <LinkIcon />
+        </button>
+
+        <button
+          style={{ position: "relative" }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            unwarpLinks(editor);
+          }}
+          className="toolbar-button"
+        >
+          <LinkIcon />
+          <span
+            style={{
+              position: "absolute",
+              bottom: -2,
+              right: 5,
+              fontSize: 10,
+              color: "tomato",
+            }}
+          >
+            x
+          </span>
         </button>
       </div>
 

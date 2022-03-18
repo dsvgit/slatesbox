@@ -2,7 +2,7 @@ import React, { memo, Fragment } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import cn from "classnames";
 import { isIOS } from "react-device-detect";
-import { Element, Node, Range } from "slate";
+import { Element, Node } from "slate";
 import { Transform } from "@dnd-kit/utilities";
 import { DraggableSyntheticListeners } from "@dnd-kit/core";
 
@@ -84,8 +84,13 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
           } as React.CSSProperties
         }
       >
-        <FoldingLine element={element} onFold={onFold} />
-        <FoldingArrow element={element} onFold={onFold} />
+        {ExtendedEditor.isNestingElement(editor, element) &&
+          ExtendedEditor.isFoldingElement(editor, element) && (
+            <FoldingLine element={element} onFold={onFold} />
+          )}
+        {ExtendedEditor.isFoldingElement(editor, element) && (
+          <FoldingArrow element={element} onFold={onFold} />
+        )}
         {children}
       </div>
     </Fragment>
@@ -94,7 +99,12 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
 
 export const Item = memo(ItemComponent, (prev, next) => {
   for (const key of [...Object.keys(prev), ...Object.keys(next)]) {
-    if (key === "children" || key === "transition" || key === "listeners") {
+    if (key === "children" || key === "listeners") {
+      continue;
+    }
+
+    // listen transition only on dragging
+    if (!(prev.isDragging || next.isDragging) && key === "transition") {
       continue;
     }
 

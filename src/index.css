@@ -27,7 +27,7 @@ body.dragging {
 }
 
 .app {
-  max-width: 800px;
+  max-width: 850px;
   /*width: 300px;*/
   padding: 40px;
   margin: 0 auto;
@@ -68,6 +68,12 @@ h3 {
   min-height: 100%;
   flex: 1;
   display: flex;
+}
+
+.item[data-slate-node-type="p"] {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  line-height: 24px;
 }
 
 .item {

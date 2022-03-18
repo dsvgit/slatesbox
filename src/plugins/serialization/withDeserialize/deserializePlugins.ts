@@ -70,6 +70,9 @@ const rules: DeserializeHtml[] = [
         validNodeName: "A",
       },
     ],
+    query: (el) => {
+      return !!el.textContent && el.textContent.trim() !== ""; // skip if link includes non text info (e.g. image)
+    },
   },
   {
     getNode: () => ({ type: DividerType }),

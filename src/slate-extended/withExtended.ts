@@ -1,10 +1,10 @@
 import { Editor, Range, Transforms, Path, Element } from "slate";
+import { nanoid } from "nanoid";
 
 import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { ParagraphElement, ParagraphType } from "plugins/paragraph/types";
 import { ListItemElement, ListItemType, ListTypes } from "plugins/list/types";
 import { FoldingElement } from "slate-extended/types";
-import { nanoid } from "nanoid";
 
 export const withExtended =
   ({

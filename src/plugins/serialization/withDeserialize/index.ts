@@ -1,8 +1,8 @@
-import { Editor, Node } from "slate";
-import { deserializeHtml, parseHtmlDocument } from "@udecode/plate-core";
+import { Editor } from "slate";
+import { deserializeHtml } from "@udecode/plate-core";
+import { indexBy } from "ramda";
 
 import { deserializePlugins } from "plugins/serialization/withDeserialize/deserializePlugins";
-import { indexBy } from "ramda";
 import { patchPastedClipboardHtml } from "plugins/serialization/withDeserialize/patchPastedClipboardHtml";
 
 export const withDeserialize = (editor: Editor) => {
