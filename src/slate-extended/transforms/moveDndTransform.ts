@@ -90,8 +90,6 @@ export const updateDndDepth = (
       const match = (node: Node) =>
         node === element ||
         (Element.isElement(node) &&
-          isFoldingElement(element) &&
-          Boolean(element.folded) &&
           semanticDescendants.some((x) => x.element.id === node.id));
 
       const entries = Editor.nodes(editor, { at: [], match });
