@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { createEditor, Editor, Transforms, Descendant, Element } from "slate";
+import { Editor, Transforms } from "slate";
 import {
   AutoScrollActivator,
   DndContext,
@@ -19,21 +19,16 @@ import {
   SortableContext,
 } from "@dnd-kit/sortable";
 import { DragStartEvent } from "@dnd-kit/core/dist/types";
-import { Slate, Editable, withReact, ReactEditor } from "slate-react";
+import { ReactEditor } from "slate-react";
 import { createPortal } from "react-dom";
 
-import { renderElementContent } from "hooks/useRenderElement";
 import { DndStateProvider } from "hooks/useDndState";
 import { sortableCollisionDetection } from "slate-extended/dnd/sortableCollisionDetection";
-import {
-  moveDndDepth,
-  moveDndElements,
-} from "slate-extended/transforms/moveDndElements";
-import { Item } from "plugins/wrapper/components/Item";
+import { moveDndTransform } from "slate-extended/transforms/moveDndTransform";
 import { isListItemElement } from "plugins/list/utils";
-import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { getDepth } from "slate-extended/dnd/utils";
 import DragOverlayContent from "plugins/wrapper/components/DragOverlayContent";
+import { ExtendedEditor } from "slate-extended/extendedEditor";
 
 const measuring = {
   droppable: {
@@ -54,32 +49,37 @@ const DndPluginContext = ({
   children,
 }: React.PropsWithChildren<DndPluginContextProps>) => {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const activeElement = editor.children.find((x) => x.id === activeId) || null;
+  const semanticNode = activeElement
+    ? ExtendedEditor.semanticNode(activeElement)
+    : null;
+
   const [overId, setOverId] = useState<string | null>(null);
   const [offsetLeft, setOffsetLeft] = useState<number>(0);
-  const [dragOverlayHeight, setDragOverlayHeight] = useState<number>(0);
-  const activeElement = editor.children.find(
-    (x) => Element.isElement(x) && x.id === activeId
+  const [_dragOverlayHeight, setDragOverlayHeight] = useState<number | null>(
+    null
   );
+  const minOverlayHeight = semanticNode
+    ? (semanticNode.descendants.length + 1) * 26
+    : 0;
+  const dragOverlayHeight =
+    _dragOverlayHeight &&
+    isListItemElement(activeElement) &&
+    !activeElement.folded
+      ? Math.max(minOverlayHeight, _dragOverlayHeight)
+      : null;
 
   const offsetDepth = Math.round(offsetLeft / 50);
   const dragDepth = useMemo(
     () =>
       overId && isListItemElement(activeElement)
-        ? getDepth(
-            editor.children as Element[],
-            activeElement,
-            overId,
-            offsetDepth
-          )
+        ? getDepth(editor.children, activeElement, overId, offsetDepth)
         : 0,
     [editor.children, overId, activeElement, offsetDepth]
   );
 
   const items = useMemo(
-    () =>
-      editor.children
-        .map((item) => (Element.isElement(item) ? item.id : undefined))
-        .filter(Boolean) as string[],
+    () => editor.children.map((item) => item.id!).filter(Boolean),
     [editor.children]
   );
 
@@ -133,41 +133,10 @@ const DndPluginContext = ({
       const { active, over } = event;
 
       if (over) {
-        const activeIndex = active.data.current?.sortable.index;
-        let overIndex = over.data.current?.sortable.index;
-
-        const element = editor.children.find(
-          (x) => Element.isElement(x) && x.id === active.id
-        ) as Element;
-
-        if (activeIndex < overIndex) {
-          const droppableIntervals = ExtendedEditor.getDroppableIntervals(
-            editor.semanticChildren,
-            editor.children.length
-          );
-          const droppableEnds = new Set(droppableIntervals.map((x) => x[1]));
-
-          // adjust over index in case it is outside droppable elements
-          for (const end of droppableEnds) {
-            if (overIndex <= end) {
-              overIndex = end;
-              break;
-            }
-          }
-        }
-
-        if (active.id !== over.id) {
-          moveDndElements(editor, active.id, overIndex);
-        }
-
-        if (isListItemElement(element) && element.depth !== dragDepth) {
-          moveDndDepth(editor, active.id, dragDepth);
-        }
+        moveDndTransform(editor, active, over, dragDepth);
       }
 
-      const selectIndex = editor.children.findIndex(
-        (x) => Element.isElement(x) && x.id === active.id
-      );
+      const selectIndex = editor.children.findIndex((x) => x.id === active.id);
       ReactEditor.focus(editor);
       Transforms.select(editor, Editor.end(editor, [selectIndex]));
 
@@ -192,10 +161,11 @@ const DndPluginContext = ({
       value={useMemo(
         () => ({
           activeId,
+          activeElement,
           dragDepth,
           dragOverlayHeight,
         }),
-        [activeId, dragDepth, dragOverlayHeight]
+        [activeId, activeElement, dragDepth, dragOverlayHeight]
       )}
     >
       <DndContext
@@ -246,20 +216,3 @@ const DndPluginContext = ({
 };
 
 export default DndPluginContext;
-
-// const DragOverlayContent = ({ element }: { element: Descendant }) => {
-//   const overlayEditor = useMemo(() => withReact(createEditor()), []);
-//   const content = [element];
-//
-//   return (
-//     <div contentEditable={false}>
-//       <Slate editor={overlayEditor} value={content} onChange={() => {}}>
-//         <Editable
-//           className="editable"
-//           renderElement={renderElementContent}
-//           readOnly={true}
-//         />
-//       </Slate>
-//     </div>
-//   );
-// };

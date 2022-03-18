@@ -22,8 +22,6 @@ export const withSerialize = (editor: Editor) => {
     const clipboardNode = getClipboardDataHtmlNode(data);
     removeSkippedElements(clipboardNode);
 
-    console.log(clipboardNode);
-
     const plainText = getClipboardPlainText(clipboardNode);
     data.setData("text/plain", plainText);
 

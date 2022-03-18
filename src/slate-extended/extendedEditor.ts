@@ -6,6 +6,7 @@ import { crawlChildren, isFoldingElement } from "slate-extended/utils";
 import { isListItemElement } from "plugins/list/utils";
 
 export interface ExtendedEditor extends BaseEditor {
+  children: Element[];
   compareLevels: (a: Element, b: Element) => number;
   semanticChildren: SemanticNode[];
   getSemanticChildren: (children: Descendant[]) => SemanticNode[];

@@ -17,9 +17,10 @@ import { FormattedText } from "plugins/marks/types";
 import { LinkElement } from "plugins/link/types";
 import { BlockquoteElement } from "plugins/blockquote/types";
 
-export type CustomEditor = BaseEditor &
-  ReactEditor &
-  HistoryEditor &
+export type CustomEditor = Omit<
+  BaseEditor & ReactEditor & HistoryEditor,
+  "children"
+> &
   ExtendedEditor;
 
 export type CustomElement =

@@ -1,9 +1,11 @@
 import { createContext, useContext } from "react";
+import { Element } from "slate";
 
 type DndStateValue = {
   activeId: string | null;
+  activeElement: Element | null;
   dragDepth: number;
-  dragOverlayHeight: number;
+  dragOverlayHeight: number | null;
 };
 
 const DndStateContext = createContext<DndStateValue>({} as DndStateValue);

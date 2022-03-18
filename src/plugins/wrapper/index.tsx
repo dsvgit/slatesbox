@@ -15,7 +15,8 @@ const Wrapper = (
   props: Omit<RenderElementProps, "children"> & { children: React.ReactNode }
 ) => {
   const { attributes, children, element } = props;
-  const { activeId, dragDepth, dragOverlayHeight } = useDndState();
+  const { activeId, activeElement, dragDepth, dragOverlayHeight } =
+    useDndState();
 
   const editor = useSlateStatic();
   const id = element.id!;
@@ -24,7 +25,9 @@ const Wrapper = (
   const semanticNode = ExtendedEditor.semanticNode(element);
   const { listIndex } = semanticNode;
   const isHiddenById =
-    activeId !== id && ExtendedEditor.isHiddenById(element, activeId);
+    isListItemElement(activeElement) &&
+    activeId !== id &&
+    ExtendedEditor.isHiddenById(element, activeId);
   const hidden = semanticNode.hidden || isHiddenById;
 
   const isInViewport = useWrapperIntersectionObserver(
@@ -75,7 +78,11 @@ const Wrapper = (
       style={
         {
           "--spacing": `${isDragging ? dragSpacing : realSpacing}px`,
-          "--drag-overlay-height": `${dragOverlayHeight}px`,
+          ...(dragOverlayHeight
+            ? {
+                "--drag-overlay-height": `${dragOverlayHeight}px`,
+              }
+            : null),
         } as React.CSSProperties
       }
     >

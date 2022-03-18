@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Descendant, Editor, Element } from "slate";
+import React, { useEffect, useMemo } from "react";
+import { Editor } from "slate";
 import { clone } from "ramda";
 
 import SlateEditor from "components/SlateEditor";
@@ -8,6 +8,7 @@ import { ExtendedEditor } from "slate-extended/extendedEditor";
 import { isListItemElement } from "plugins/list/utils";
 import { RenderElementProps } from "slate-react/dist/components/editable";
 import { useResizeDetector } from "react-resize-detector";
+import cn from "classnames";
 
 type Props = {
   editor: Editor;
@@ -23,37 +24,45 @@ const DragOverlayContent = (props: Props) => {
     onHeightChange(height);
   }, [height]);
 
-  const activeIndex = (editor.children as Element[]).findIndex(
-    (x) => x.id === activeId
-  );
+  const activeIndex = editor.children.findIndex((x) => x.id === activeId);
   const element = editor.children[activeIndex];
 
-  let initialValue: Descendant[] = [];
-  if (Element.isElement(element)) {
+  const initialValue = useMemo(() => {
+    let content;
     if (isListItemElement(element)) {
       const semanticNode = ExtendedEditor.semanticNode(element);
       const { descendants } = semanticNode;
-      const lastIndex = activeIndex + descendants.length;
       const baseDepth = element.depth;
 
-      initialValue = clone(
+      content = clone(
         element.folded
           ? [element]
-          : editor.children.slice(activeIndex, lastIndex + 1)
+          : [
+              element,
+              ...descendants.filter((x) => !x.hidden).map((x) => x.element),
+            ]
       );
 
-      initialValue.forEach((element) => {
+      content.forEach((element) => {
         if (isListItemElement(element)) {
           element.depth -= baseDepth;
         }
       });
     } else {
-      initialValue = clone([element]);
+      content = clone([element]);
     }
-  }
+
+    return content;
+  }, [editor.children, activeId]);
 
   return (
-    <div ref={ref} contentEditable={false} className="dragOverlay">
+    <div
+      ref={ref}
+      contentEditable={false}
+      className={cn("dragOverlay", {
+        dragOverlayList: isListItemElement(element),
+      })}
+    >
       {element && (
         <SlateEditor
           initialValue={initialValue}

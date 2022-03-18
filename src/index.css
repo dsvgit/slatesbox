@@ -382,4 +382,9 @@ body.dragging .handle {
 
 .dragOverlay {
   background-color: white;
+  padding: 3px 40px;
+}
+
+.dragOverlayList {
+  padding-left: 0;
 }

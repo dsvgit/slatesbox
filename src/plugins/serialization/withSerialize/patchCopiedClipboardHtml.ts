@@ -47,8 +47,6 @@ export const patchCopiedClipboardHtml = (root: Element) => {
 
     const tree = listItemsToTree(items); // flatten items to tree
 
-    console.log("tree", items, tree);
-
     listNode.innerHTML = "";
     createDOMTree(listNode, tree); // tree to DOM tree
   }
