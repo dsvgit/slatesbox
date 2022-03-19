@@ -1,5 +1,5 @@
-import React, { Fragment, useCallback, useRef, useState } from "react";
-import { createEditor, Descendant, Editor } from "slate";
+import React, { Fragment, useCallback, useMemo, useState } from "react";
+import { createEditor, Descendant } from "slate";
 import { Slate, Editable, withReact, useSlate } from "slate-react";
 import { withHistory } from "slate-history";
 
@@ -30,19 +30,20 @@ import withHeading from "plugins/heading/withHeading";
 import DragOverlayContent from "plugins/wrapper/components/DragOverlayContent";
 import { withTrailingLine } from "plugins/trailingLine/withTrailingLine";
 import * as exitBreakHandlers from "plugins/exitBreak/handlers";
+import usePersistedState from "hooks/usePersistedState";
 
 type Props = {
+  id: string;
   initialValue: Descendant[];
   readOnly?: boolean;
   renderElement?: EditableProps["renderElement"];
 };
 
 const SlateEditor = (props: Props) => {
-  const { initialValue, readOnly = false, renderElement } = props;
+  const { id, initialValue, readOnly = false, renderElement } = props;
 
-  const editorRef = useRef<Editor>();
-  if (!editorRef.current) {
-    editorRef.current = composePlugins(
+  const editor = useMemo(() => {
+    return composePlugins(
       [
         withTrailingLine,
         withResetType,
@@ -63,10 +64,18 @@ const SlateEditor = (props: Props) => {
       ],
       createEditor()
     );
-  }
+  }, []);
 
-  const editor = editorRef.current;
-  const [value, setValue] = useState<Descendant[]>(initialValue);
+  const [value, setValue] = usePersistedState<Descendant[]>(
+    `${id}_content`,
+    (restored) => {
+      if (readOnly) {
+        return initialValue;
+      }
+
+      return restored ?? initialValue;
+    }
+  );
 
   const [, forceRerender] = useState(0);
 

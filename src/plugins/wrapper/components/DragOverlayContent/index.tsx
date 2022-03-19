@@ -67,6 +67,7 @@ const DragOverlayContent = (props: Props) => {
     >
       {element && (
         <SlateEditor
+          id="overlay"
           initialValue={initialValue}
           readOnly={true}
           renderElement={renderDragOverlayElement}

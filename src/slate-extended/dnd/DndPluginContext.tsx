@@ -182,16 +182,18 @@ const DndPluginContext = ({
         onDragCancel={handleDragCancel}
         sensors={sensors}
         measuring={measuring}
-        autoScroll={{
-          threshold: {
-            x: 0.22,
-            y: 0.22,
-          },
-          interval: 5,
-          acceleration: 30,
-          activator: AutoScrollActivator.Pointer,
-          order: TraversalOrder.TreeOrder,
-        }}
+        autoScroll={
+          false && {
+            threshold: {
+              x: 0.18,
+              y: 0.18,
+            },
+            interval: 5,
+            acceleration: 20,
+            activator: AutoScrollActivator.Pointer,
+            order: TraversalOrder.TreeOrder,
+          }
+        }
       >
         <SortableContext strategy={verticalListSortingStrategy} items={items}>
           {children}

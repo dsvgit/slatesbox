@@ -48,6 +48,7 @@ export const sortableCollisionDetectionAlgorithm = (
     const currentRect = currentContainer.rect.current;
 
     if (currentRect && firstRect && lastRect) {
+      const containerIndex = currentContainer.data.current?.sortable.index;
       const currentCenter = currentRect.top + currentRect.height / 2;
 
       const prevRect = containers[index - 1]?.rect.current;
@@ -63,10 +64,10 @@ export const sortableCollisionDetectionAlgorithm = (
       let activeInterval: [number, number];
       let testInterval: [number, number];
 
-      if (index < activeIndex) {
+      if (containerIndex < activeIndex) {
         activeInterval = [top, top];
         testInterval = [prevCenter, currentCenter];
-      } else if (index > activeIndex) {
+      } else if (containerIndex > activeIndex) {
         activeInterval = [bottom, bottom];
         testInterval = [currentCenter, nextCenter];
       } else {
@@ -77,7 +78,7 @@ export const sortableCollisionDetectionAlgorithm = (
       const includes =
         testInterval[0] < activeInterval[0] &&
         testInterval[1] >= activeInterval[1];
-      const sign = includes ? -1 : 1; // sign define if active points inside test interval
+      const sign = includes ? -1 : 1; // sign defines if active points inside test interval
 
       const center = (activeInterval[0] + activeInterval[1]) / 2; // not really important
 
@@ -93,7 +94,6 @@ export const sortableCollisionDetectionAlgorithm = (
         data: {
           droppableContainer: currentContainer as DroppableContainer,
           value,
-          index,
         },
       });
     }

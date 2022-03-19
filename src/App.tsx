@@ -7,7 +7,7 @@ import SlateEditor from "components/SlateEditor";
 const App = () => {
   return (
     <main className="app">
-      <SlateEditor initialValue={initialValue} />
+      <SlateEditor id="main" initialValue={initialValue} />
     </main>
   );
 };
