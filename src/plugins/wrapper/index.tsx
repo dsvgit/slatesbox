@@ -59,10 +59,13 @@ const Wrapper = (
     : 0;
   const dragSpacing = 50 * dragDepth;
 
+  const spellCheck = selected ? "true" : "false";
+
   const Tag = ExtendedEditor.isNestingElement(editor, element) ? "li" : "div";
 
   return (
     <Tag
+      spellCheck={spellCheck}
       {...attributes}
       {...(ExtendedEditor.isNestingElement(editor, element)
         ? makeListItemAttributes({
