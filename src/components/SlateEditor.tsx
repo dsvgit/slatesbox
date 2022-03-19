@@ -29,6 +29,7 @@ import { compareLevels } from "components/utils";
 import withHeading from "plugins/heading/withHeading";
 import DragOverlayContent from "plugins/wrapper/components/DragOverlayContent";
 import { withTrailingLine } from "plugins/trailingLine/withTrailingLine";
+import * as exitBreakHandlers from "plugins/exitBreak/handlers";
 
 type Props = {
   initialValue: Descendant[];
@@ -73,6 +74,7 @@ const SlateEditor = (props: Props) => {
     listHandlers.onKeyDown(editor)(e);
     softBreakHandlers.onKeyDown(editor)(e);
     markHandlers.onKeyDown(editor)(e);
+    exitBreakHandlers.onKeyDown(editor)(e);
 
     forceRerender((x) => x + 1); // after dnd ends then ReactEditor.focus call, to continue typing
   }, []);
