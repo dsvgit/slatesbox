@@ -1,4 +1,5 @@
 import React from "react";
+import { useFocused } from "slate-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { useIsomorphicLayoutEffect } from "@dnd-kit/utilities";
 
@@ -10,6 +11,15 @@ export const Sortable = ({
 }: {
   id: string;
 } & React.PropsWithChildren<ItemProps>) => {
+  const sortable = useSortable({
+    id,
+    animateLayoutChanges: () => false,
+    transition: {
+      duration: 350,
+      easing: "ease",
+    },
+  });
+
   const {
     transition,
     transform,
@@ -17,13 +27,9 @@ export const Sortable = ({
     isDragging,
     isSorting,
     setNodeRef,
-  } = useSortable({
-    id,
-    transition: {
-      duration: 350,
-      easing: "ease",
-    },
-  });
+  } = sortable;
+
+  const focused = useFocused();
 
   useIsomorphicLayoutEffect(() => {
     props.elementRef && setNodeRef(props.elementRef.current);
@@ -32,7 +38,7 @@ export const Sortable = ({
   return (
     <Item
       {...props}
-      transition={transition}
+      transition={focused ? null : transition}
       transform={transform}
       listeners={listeners}
       isDragging={isDragging}

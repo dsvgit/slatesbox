@@ -28,10 +28,13 @@ export const patchCopiedClipboardHtml = (root: Element) => {
   });
 
   acc.forEach((nodes) => {
-    const ul = document.createElement("ul");
-    root.insertBefore(ul, nodes[0]);
+    if (nodes.length > 0) {
+      const props = getListItemProps(nodes[0] as HTMLElement);
+      const ul = document.createElement(getHtmlTag(props.listType));
+      root.insertBefore(ul, nodes[0]);
 
-    nodes.forEach((li) => ul.appendChild(li));
+      nodes.forEach((li) => ul.appendChild(li));
+    }
   });
 
   const listNodes = Array.from(root.querySelectorAll("ul, ol"));

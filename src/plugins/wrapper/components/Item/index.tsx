@@ -103,11 +103,6 @@ export const Item = memo(ItemComponent, (prev, next) => {
       continue;
     }
 
-    // listen transition only on dragging
-    if (!(prev.isDragging || next.isDragging) && key === "transition") {
-      continue;
-    }
-
     // @ts-ignore
     if (prev[key] !== next[key]) {
       return false;
