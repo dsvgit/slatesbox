@@ -2,16 +2,20 @@ import React, { memo, useEffect, useState } from "react";
 import { Element } from "slate";
 import { ReactEditor, useSlate } from "slate-react";
 import { getClientRect } from "@dnd-kit/core";
+import { Transform } from "@dnd-kit/utilities";
 
 import { ExtendedEditor } from "slate-extended/extendedEditor";
+import { useDndState } from "slate-extended/dnd/useDndState";
 
 type Props = {
   onFold?: React.MouseEventHandler;
+  transform?: Transform | null;
 };
 
 const FoldingLine = (props: Props & { element: Element }) => {
   const editor = useSlate();
-  const { element, onFold } = props;
+  const { activeId } = useDndState();
+  const { element, onFold, transform } = props;
   const [height, setHeight] = useState(0);
 
   const hasFoldingLine =
@@ -38,18 +42,32 @@ const FoldingLine = (props: Props & { element: Element }) => {
       const elementDom = ReactEditor.toDOMNode(editor, element);
       const lastDescendantDom = ReactEditor.toDOMNode(editor, lastDescendant);
 
-      const rect1 = getClientRect(elementDom);
-      const rect2 = getClientRect(lastDescendantDom);
+      const byNextSibling = lastDescendant.id === activeId;
 
-      const height = rect2.top + rect2.height - rect1.top - 26;
+      Promise.resolve().then(() => {
+        const rect1 = getClientRect(elementDom.querySelector("div")!);
+        const top = rect1.top + rect1.height;
 
-      setHeight(height);
+        let bottom;
+        if (byNextSibling && lastDescendantDom.nextElementSibling) {
+          const rect2 = getClientRect(
+            lastDescendantDom.nextElementSibling.querySelector("div")!
+          );
+          bottom = rect2.top;
+        } else {
+          const rect2 = getClientRect(lastDescendantDom.querySelector("div")!);
+          bottom = rect2.top + rect2.height;
+        }
+
+        const newHeight = Math.floor(bottom - top);
+        setHeight(newHeight);
+      });
     } catch (error) {
       console.error(error);
     }
-  }, [hasFoldingLine, editor.children]);
+  }, [hasFoldingLine, transform, editor.children]);
 
-  if (hasFoldingLine) {
+  if (hasFoldingLine && activeId == null) {
     return (
       <FoldingLineMemoized
         depth={element.depth}

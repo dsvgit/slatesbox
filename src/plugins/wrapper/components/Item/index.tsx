@@ -86,7 +86,11 @@ const ItemComponent = (props: React.PropsWithChildren<ItemProps>) => {
       >
         {ExtendedEditor.isNestingElement(editor, element) &&
           ExtendedEditor.isFoldingElement(editor, element) && (
-            <FoldingLine element={element} onFold={onFold} />
+            <FoldingLine
+              element={element}
+              onFold={onFold}
+              transform={transform}
+            />
           )}
         {ExtendedEditor.isFoldingElement(editor, element) && (
           <FoldingArrow element={element} onFold={onFold} />

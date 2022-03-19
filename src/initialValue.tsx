@@ -256,6 +256,7 @@ const listValue: Descendant[] = [
     children: [{ text: "Today" }],
   },
   {
+    id: "1",
     type: "list_item",
     listType: ListTypes.Bulleted,
     depth: 0,
