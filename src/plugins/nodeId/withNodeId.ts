@@ -6,7 +6,7 @@ const makeId = () => nanoid(16);
 
 export const assignIdRecursively = (node: Node) => {
   if (Element.isElement(node)) {
-    node.id = node.id || makeId();
+    node.id = makeId();
 
     node.children.forEach(assignIdRecursively);
   }

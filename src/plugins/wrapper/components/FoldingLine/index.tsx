@@ -46,7 +46,7 @@ const FoldingLine = (props: Props & { element: Element }) => {
 
       Promise.resolve().then(() => {
         const rect1 = getClientRect(elementDom.querySelector("div")!);
-        const top = rect1.top + rect1.height;
+        const top = rect1.top + 26;
 
         let bottom;
         if (byNextSibling && lastDescendantDom.nextElementSibling) {

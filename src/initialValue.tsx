@@ -1,6 +1,6 @@
-import { Descendant } from "slate";
+import { Descendant, Element, Node } from "slate";
 import { ListTypes } from "plugins/list/types";
-import { assignIdRecursively } from "plugins/nodeId/withNodeId";
+import { nanoid } from "nanoid";
 
 const clone = (x: object) => JSON.parse(JSON.stringify(x));
 
@@ -394,6 +394,15 @@ const sValue: Descendant[] = [
 ];
 
 const data: Descendant[] = [...listValue];
+
+const makeId = () => nanoid(16);
+const assignIdRecursively = (node: Node) => {
+  if (Element.isElement(node)) {
+    node.id = node.id ?? makeId();
+
+    node.children.forEach(assignIdRecursively);
+  }
+};
 
 data.forEach(assignIdRecursively);
 
