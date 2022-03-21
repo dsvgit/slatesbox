@@ -1,99 +1,49 @@
-import React, { Fragment, useCallback, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { createEditor, Descendant } from "slate";
-import { Slate, Editable, withReact, useSlate } from "slate-react";
-import { withHistory } from "slate-history";
+import { Slate, Editable } from "slate-react";
 
-import { withImage } from "plugins/image/withImage";
 import DndPluginContext from "slate-extended/dnd/DndPluginContext";
-import useRenderElement from "hooks/useRenderElement";
-import { withDivider } from "plugins/divider/withDivider";
-import { withNodeId } from "plugins/nodeId/withNodeId";
-import * as listHandlers from "plugins/list/handlers";
-import * as softBreakHandlers from "plugins/softBreak/handlers";
-import * as markHandlers from "plugins/marks/handlers";
-import withList from "plugins/list/withList";
-import EditorToolbar from "components/EditorToolbar";
+import useRenderElement from "components/hooks/useRenderElement";
 import SlateExtended from "slate-extended/SlateExtended";
-import Card from "components/Card";
-import { EditableProps } from "slate-react/dist/components/editable";
-import { withExtended } from "slate-extended/withExtended";
-import { composePlugins } from "utils";
-import { withAutoformat } from "plugins/autoformat/withAutoformat";
-import { autoformatRules } from "plugins/autoformat/autoformatRules";
-import { withResetType } from "plugins/resetType/withResetType";
-import { withDeserialize } from "plugins/serialization/withDeserialize";
-import { renderLeaf } from "plugins/marks/renderLeaf";
-import { withLink } from "plugins/link/withLink";
-import { withSerialize } from "plugins/serialization/withSerialize";
-import { compareLevels } from "components/utils";
-import withHeading from "plugins/heading/withHeading";
 import DragOverlayContent from "plugins/wrapper/components/DragOverlayContent";
-import { withTrailingLine } from "plugins/trailingLine/withTrailingLine";
-import * as exitBreakHandlers from "plugins/exitBreak/handlers";
 import usePersistedState from "hooks/usePersistedState";
+import usePlugins from "components/hooks/usePlugins";
+import useEditor from "components/hooks/useEditor";
+import useHandlers from "components/hooks/useHandlers";
+import useRenderLeaf from "components/hooks/useRenderLeaf";
+import EditorToolbar from "components/EditorToolbar";
+import Card from "components/Card";
 
 type Props = {
   id: string;
   initialValue: Descendant[];
   readOnly?: boolean;
-  renderElement?: EditableProps["renderElement"];
 };
 
 const SlateEditor = (props: Props) => {
-  const { id, initialValue, readOnly = false, renderElement } = props;
-
-  const editor = useMemo(() => {
-    return composePlugins(
-      [
-        withTrailingLine,
-        withResetType,
-        withAutoformat(autoformatRules),
-        withList,
-        withDivider,
-        withHeading,
-        withLink,
-        withImage,
-        withSerialize,
-        withDeserialize,
-        withExtended({
-          compareLevels,
-        }),
-        withNodeId,
-        withHistory,
-        withReact,
-      ],
-      createEditor()
-    );
-  }, []);
-
-  const [value, setValue] = usePersistedState<Descendant[]>(
-    `${id}_content`,
-    (restored) => {
-      if (readOnly) {
-        return initialValue;
-      }
-
-      return restored ?? initialValue;
-    }
-  );
+  const { id, initialValue, readOnly = false } = props;
 
   const [, forceRerender] = useState(0);
 
-  const onKeyDown: React.KeyboardEventHandler = useCallback((e) => {
-    listHandlers.onKeyDown(editor)(e);
-    softBreakHandlers.onKeyDown(editor)(e);
-    markHandlers.onKeyDown(editor)(e);
-    exitBreakHandlers.onKeyDown(editor)(e);
+  const plugins = usePlugins();
+  const editor = useEditor(createEditor, plugins);
+  const handlers = useHandlers(editor, [
+    ...plugins,
+    {
+      handlers: {
+        onKeyDown: () => () => {
+          forceRerender((x) => x + 1); // after dnd ends then ReactEditor.focus call, to continue typing
+        },
+      },
+    },
+  ]);
 
-    forceRerender((x) => x + 1); // after dnd ends then ReactEditor.focus call, to continue typing
-  }, []);
+  const renderElement = useRenderElement(editor, plugins);
+  const renderLeaf = useRenderLeaf(editor, plugins);
 
-  const renderedEditor = (
-    <SlateEditable
-      readOnly={readOnly}
-      onKeyDown={onKeyDown}
-      renderElement={renderElement}
-    />
+  const [value, setValue] = usePersistedState<Descendant[]>(
+    `${id}_content`,
+    (restored) => (readOnly ? initialValue : restored ?? initialValue)
   );
 
   return (
@@ -106,37 +56,18 @@ const SlateEditor = (props: Props) => {
           editor={editor}
           renderDragOverlay={(props) => <DragOverlayContent {...props} />}
         >
-          {readOnly ? (
-            renderedEditor
-          ) : (
-            <Fragment>
-              <EditorToolbar />
-              <Card>{renderedEditor}</Card>
-            </Fragment>
-          )}
+          <EditorToolbar />
+          <Card>
+            <Editable
+              className="editable"
+              {...handlers}
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+            />
+          </Card>
         </DndPluginContext>
       </SlateExtended>
     </Slate>
-  );
-};
-
-const SlateEditable = (props: EditableProps) => {
-  const editor = useSlate();
-
-  const renderElement = useRenderElement(editor);
-
-  return (
-    <Fragment>
-      <Editable
-        className="editable"
-        renderElement={props.renderElement || renderElement}
-        renderLeaf={renderLeaf}
-        onKeyDown={props.onKeyDown}
-      />
-      {/*<pre style={{ position: "absolute", fontSize: 13, top: 0, right: 100 }}>*/}
-      {/*  {JSON.stringify(editor?.selection, null, 2)}*/}
-      {/*</pre>*/}
-    </Fragment>
   );
 };
 

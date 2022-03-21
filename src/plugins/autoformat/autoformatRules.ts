@@ -8,6 +8,7 @@ import {
 import { ListItemType, ListTypes } from "plugins/list/types";
 import { Editor } from "slate";
 import { toggleList } from "plugins/list/transforms";
+import { BlockquoteType } from "plugins/blockquote/types";
 
 export const autoformatRules: AutoformatRule[] = [
   {
@@ -24,6 +25,11 @@ export const autoformatRules: AutoformatRule[] = [
     mode: "block",
     type: Heading3Type,
     match: "### ",
+  },
+  {
+    mode: "block",
+    type: BlockquoteType,
+    match: "> ",
   },
   {
     mode: "block",

@@ -1,6 +1,7 @@
 import React from "react";
 import { Editor, Transforms, Path, Range } from "slate";
 import isHotkey from "is-hotkey";
+
 import { ParagraphType } from "plugins/paragraph/types";
 
 export const onKeyDown = (editor: Editor) => (e: React.KeyboardEvent) => {
