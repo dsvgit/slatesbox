@@ -1,7 +1,7 @@
 # Slate sandbox
 
 Development:
-```
+```bash
 yarn
 yarn start
 ```
